@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>Workr: Job <%= job_info.name %></title>
+    </head>
+    <body>
+        <h1>Workr</h1>
+        <h3>Job <%= job_info.name %></h3>
+        <b>Executions: </b>
+        <ul>
+            <%- job_executions.each do |job_execution| -%>
+            <li>
+                <%= job_execution.id %>
+            </li>
+            <%- end -%>
+        </ul>
+    </body>
+</html>

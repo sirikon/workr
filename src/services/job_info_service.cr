@@ -1,4 +1,4 @@
-require "../models/job_info"
+require "../models/models"
 
 module Workr::Services::JobInfoService
   extend self

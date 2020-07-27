@@ -9,3 +9,7 @@ authors:
 targets:
   workr:
     main: src/workr.cr
+
+dependencies:
+  router:
+    github: tbrand/router.cr

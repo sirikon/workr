@@ -1,5 +1,6 @@
 require "json"
 require "./job_info_service.cr"
+require "../models/models"
 
 module Workr::Services::JobDataService
   extend self
@@ -33,6 +34,18 @@ module Workr::Services::JobDataService
     end
   end
 
+  def get_all_executions(job_name)
+    job_data_folder = get_job_data_folder(job_name)
+    if !Dir.exists?(job_data_folder)
+      return [] of Models::JobExecutionInfo
+    end
+    Dir.children(get_job_data_folder(job_name))
+      .reject!(->(name : String){ !Dir.exists?(job_data_folder / name) })
+      .map do |name|
+        Models::JobExecutionInfo.new(name)
+      end
+  end
+
   private def ensure_job_execution_data_folder(job_name, job_execution_id)
     job_execution_data_folder = get_job_execution_data_folder(job_name, job_execution_id)
     if Dir.exists?(job_execution_data_folder)
@@ -53,15 +66,15 @@ module Workr::Services::JobDataService
   end
 
   private def get_job_execution_data_folder(job_name, job_execution_id)
-    return get_job_data_folder(job_name) / job_execution_id.to_s
+    get_job_data_folder(job_name) / job_execution_id.to_s
   end
 
   private def get_job_data_folder(job_name)
-    return get_data_folder / job_name
+    get_data_folder / job_name
   end
 
   private def get_data_folder
-    return Path[Dir.current] / "data"
+    Path[Dir.current] / "data"
   end
 
   private def write_job_data(job_name, job_data)

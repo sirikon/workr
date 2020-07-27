@@ -3,4 +3,7 @@ module Workr::Models
     name : String,
     path : String,
     entrypoint : String
+
+  record JobExecutionInfo,
+    id : String
 end
