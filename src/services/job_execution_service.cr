@@ -4,13 +4,19 @@ require "./job_data_service"
 module Workr::Services::JobExecutionService
   extend self
 
-  def run_wait(job_name : String)
-    execution_id, waiter = run(job_name)
-    waiter.call()
+  def run(job_name : String, wait : Bool = false)
+    execution_id, waiter = run_internal(job_name)
+    if wait
+      waiter.call()
+    else
+      spawn do
+        waiter.call()
+      end
+    end
     return execution_id
   end
 
-  def run(job_name : String)
+  private def run_internal(job_name : String)
     job_info = JobInfoService.get_job(job_name)
     job_execution_id = JobDataService.create_execution(job_info.name)
     puts "Running job #{job_info.name}##{job_execution_id}"

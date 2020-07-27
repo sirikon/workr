@@ -2,6 +2,7 @@ require "router"
 require "ecr"
 require "../services/job_info_service"
 require "../services/job_data_service"
+require "../services/job_execution_service"
 require "./templates"
 
 module Workr::Web::Server
@@ -20,6 +21,12 @@ module Workr::Web::Server
         job_info = Services::JobInfoService.get_job params["name"]
         job_executions = Services::JobDataService.get_all_executions(job_info.name)
         context.response.print Templates.job(job_info, job_executions)
+        context
+      end
+      post "/job/:name/run" do |context, params|
+        job_name = params["name"]
+        execution_id = Services::JobExecutionService.run(job_name)
+        context.response.headers.add("Location", "/job/#{job_name}/execution/#{execution_id}}")
         context
       end
     end
