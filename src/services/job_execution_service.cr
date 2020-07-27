@@ -4,7 +4,13 @@ require "./job_data_service"
 module Workr::Services::JobExecutionService
   extend self
 
-  def run(job_name)
+  def run_wait(job_name : String)
+    execution_id, waiter = run(job_name)
+    waiter.call()
+    return execution_id
+  end
+
+  def run(job_name : String)
     job_info = JobInfoService.get_job(job_name)
     job_execution_id = JobDataService.create_execution(job_info.name)
     puts "Running job #{job_info.name}##{job_execution_id}"
@@ -19,6 +25,7 @@ module Workr::Services::JobExecutionService
 
     process_finished = Channel(Nil).new
     output_finished = Channel(Nil).new
+    done = Channel(Nil).new
 
     spawn do
       JobDataService.write_execution_output job_info.@name, job_execution_id do |writer|
@@ -34,8 +41,13 @@ module Workr::Services::JobExecutionService
       output_finished.send(nil)
     end
 
-    process.wait
-    process_finished.send(nil)
-    output_finished.receive
+    spawn do
+      process.wait
+      process_finished.send(nil)
+      output_finished.receive
+      done.send(nil)
+    end
+
+    return job_execution_id, ->{ done.receive }
   end
 end
