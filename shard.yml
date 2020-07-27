@@ -1,0 +1,11 @@
+name: workr
+version: 0.1.0
+crystal: 0.35.1
+license: GPL-3.0
+
+authors:
+  - Carlos Fdez. Llamas <hello@sirikon.me>
+
+targets:
+  workr:
+    main: src/workr.cr
