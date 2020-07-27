@@ -15,11 +15,21 @@ module Workr::Services::JobDataService
     return job_data.@last_execution_id
   end
 
-  def open_execution_output(job_name, job_execution_id)
+  def write_execution_output(job_name, job_execution_id)
     ensure_job_execution_data_folder(job_name, job_execution_id)
     job_execution_data_folder = get_job_execution_data_folder(job_name, job_execution_id)
     File.open job_execution_data_folder / "output.log", mode: "a" do |file|
-      yield file
+      writing = true
+      spawn do
+        while writing
+          file.fsync
+          sleep 2
+        end
+      end
+      yield ->(data: Bytes){
+        file.write(data)
+      }
+      writing = false
     end
   end
 

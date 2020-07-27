@@ -21,26 +21,15 @@ module Workr::Services::JobExecutionService
     output_finished = Channel(Nil).new
 
     spawn do
-      JobDataService.open_execution_output job_info.@name, job_execution_id do |file|
-        writing = true
-
+      JobDataService.write_execution_output job_info.@name, job_execution_id do |writer|
         spawn do
           output_reader.each_byte do |byte|
             bytes = Slice.new(1, byte)
-            file.write(bytes)
+            writer.call(bytes)
             print String.new(bytes)
           end
         end
-
-        spawn do
-          while writing
-            file.fsync
-            sleep 2
-          end
-        end
-
         process_finished.receive
-        writing = false
       end
       output_finished.send(nil)
     end
