@@ -15,7 +15,24 @@ module Workr::Services::JobDataService
     return job_data.@last_execution_id
   end
 
-  def ensure_job_data_folder(job_name)
+  def open_execution_output(job_name, job_execution_id)
+    ensure_job_execution_data_folder(job_name, job_execution_id)
+    job_execution_data_folder = get_job_execution_data_folder(job_name, job_execution_id)
+    File.open job_execution_data_folder / "output.log", mode: "a" do |file|
+      yield file
+    end
+  end
+
+  private def ensure_job_execution_data_folder(job_name, job_execution_id)
+    job_execution_data_folder = get_job_execution_data_folder(job_name, job_execution_id)
+    if Dir.exists?(job_execution_data_folder)
+      return
+    end
+    Dir.mkdir_p(job_execution_data_folder)
+    File.touch(job_execution_data_folder / "output.log")
+  end
+
+  private def ensure_job_data_folder(job_name)
     job_data_folder = get_job_data_folder(job_name)
     if Dir.exists?(job_data_folder)
       return
@@ -23,6 +40,10 @@ module Workr::Services::JobDataService
 
     Dir.mkdir_p(job_data_folder)
     write_job_data(job_name, JobData.new(0))
+  end
+
+  private def get_job_execution_data_folder(job_name, job_execution_id)
+    return get_job_data_folder(job_name) / job_execution_id.to_s
   end
 
   private def get_job_data_folder(job_name)
