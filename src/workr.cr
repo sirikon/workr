@@ -1,4 +1,5 @@
-# TODO: Write documentation for `Workr`
+require "./services/job_execution_service"
+
 module Workr
-  # TODO: Put your code here
+  Services::JobExecutionService.run "greeter"
 end
