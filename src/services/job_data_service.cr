@@ -37,13 +37,18 @@ module Workr::Services::JobDataService
   def get_all_executions(job_name)
     job_data_folder = get_job_data_folder(job_name)
     if !Dir.exists?(job_data_folder)
-      return [] of Models::JobExecutionInfo
+      return [] of Models::JobExecutionData
     end
     Dir.children(get_job_data_folder(job_name))
-      .reject!(->(name : String){ !Dir.exists?(job_data_folder / name) })
-      .map do |name|
-        Models::JobExecutionInfo.new(name)
-      end
+      .reject! { |id| !Dir.exists?(job_data_folder / id) }
+      .map { |id| UInt32.new(id) }
+      .sort.reverse
+      .map { |id| Models::JobExecutionData.new(id) }
+  end
+
+  def get_execution_output(job_name, job_execution_id)
+    job_execution_data_folder = get_job_execution_data_folder(job_name, job_execution_id)
+    File.read(job_execution_data_folder / "output.log")
   end
 
   private def ensure_job_execution_data_folder(job_name, job_execution_id)
@@ -88,7 +93,7 @@ module Workr::Services::JobDataService
   private class JobData
     include JSON::Serializable
 
-    def initialize(@last_execution_id : Int32); end
+    def initialize(@last_execution_id : UInt32); end
 
     def increase_execution_id
       @last_execution_id = @last_execution_id + 1

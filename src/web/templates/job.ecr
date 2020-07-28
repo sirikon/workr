@@ -12,7 +12,9 @@
         <ul>
             <%- job_executions.each do |job_execution| -%>
             <li>
-                <%= job_execution.id %>
+                <a href="/job/<%= job_info.name %>/execution/<%= job_execution.id %>">
+                    <%= job_execution.id %>
+                </a>
             </li>
             <%- end -%>
         </ul>

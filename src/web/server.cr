@@ -23,6 +23,14 @@ module Workr::Web::Server
         context.response.print Templates.job(job_info, job_executions)
         context
       end
+      get "/job/:name/execution/:execution" do |context, params|
+        job_name = params["name"]
+        job_execution_id = UInt32.new(params["execution"])
+        job_info = Services::JobInfoService.get_job params["name"]
+        job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
+        context.response.print Templates.job_execution(job_info, job_execution_id, job_execution_output)
+        context
+      end
       post "/job/:name/run" do |context, params|
         job_name = params["name"]
         execution_id = Services::JobExecutionService.run(job_name)

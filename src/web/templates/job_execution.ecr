@@ -1,0 +1,12 @@
+<html>
+    <head>
+        <title>Workr: Job <%= job_info.name %></title>
+    </head>
+    <body>
+        <h1><a href="/">Workr</a></h1>
+        <h3>Execution <%= job_info.name %>#<%= job_execution_id %></h3>
+        <pre>
+            <%= job_execution_output %>
+        </pre>
+    </body>
+</html>

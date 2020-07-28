@@ -4,6 +4,6 @@ module Workr::Models
     path : String,
     entrypoint : String
 
-  record JobExecutionInfo,
-    id : String
+  record JobExecutionData,
+    id : UInt32
 end

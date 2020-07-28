@@ -19,7 +19,6 @@ module Workr::Services::JobExecutionService
   private def run_internal(job_name : String)
     job_info = JobInfoService.get_job(job_name)
     job_execution_id = JobDataService.create_execution(job_info.name)
-    puts "Running job #{job_info.name}##{job_execution_id}"
 
     output_reader, output_writer = IO.pipe(write_blocking: true)
 
@@ -39,7 +38,6 @@ module Workr::Services::JobExecutionService
           output_reader.each_byte do |byte|
             bytes = Slice.new(1, byte)
             writer.call(bytes)
-            print String.new(bytes)
           end
         end
         process_finished.receive
