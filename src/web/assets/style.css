@@ -113,3 +113,16 @@ a {
 .execution_status_finished.is-failed, .status_dot.is-failed {
     background-color: #EA2027;
 }
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.is-running {
+    animation-name: blink;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
