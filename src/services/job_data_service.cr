@@ -8,14 +8,6 @@ module Workr::Services::JobDataService
   @@job_execution_output_subscribers = {} of String => Array(Bytes -> Nil)
   @@job_execution_output_cache = {} of String => Array(Bytes)
 
-  spawn do
-    loop do
-      puts @@job_execution_output_subscribers
-      puts @@job_execution_output_cache
-      sleep 2
-    end
-  end
-
   def create_execution(job_name)
     job_info = JobInfoService.get_job(job_name)
 
