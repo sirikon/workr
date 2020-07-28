@@ -12,7 +12,7 @@ module Workr::Services::JobDataService
     job_info = JobInfoService.get_job(job_name)
 
     ensure_job_data_folder(job_info.name)
-    job_data = read_job_data(job_info.name)
+    job_data = read_job_data(job_info.name).not_nil!
     job_data.increase_execution_id
     write_job_data(job_info.name, job_data)
 
@@ -47,11 +47,16 @@ module Workr::Services::JobDataService
       }
       file.fsync
       send_output_to_subscribers(job_name, job_execution_id, Slice(UInt8).new(0))
-
-
-
       writing = false
     end
+  end
+
+  def get_job(job_name)
+    job_data = read_job_data(job_name)
+    if job_data.nil?
+      return nil
+    end
+    Models::JobData.new(job_name, job_data.not_nil!.@last_execution_id)
   end
 
   def get_all_executions(job_name)
@@ -174,7 +179,11 @@ module Workr::Services::JobDataService
   end
 
   private def read_job_data(job_name)
-    JobData.from_json(File.read(get_job_data_folder(job_name) / "data.json"))
+    data_path = get_job_data_folder(job_name) / "data.json"
+    if !File.exists?(data_path)
+      return nil
+    end
+    JobData.from_json(File.read(data_path))
   end
 
   private def write_job_execution_data(job_name, job_execution_id, job_execution_data)

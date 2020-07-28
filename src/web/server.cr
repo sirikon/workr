@@ -4,6 +4,7 @@ require "../services/job_info_service"
 require "../services/job_data_service"
 require "../services/job_execution_service"
 require "./templates"
+require "../models/models"
 
 module Workr::Web::Server
   extend self
@@ -11,9 +12,26 @@ module Workr::Web::Server
   class WebServer
     include Router
 
+    macro reply_asset(ctx, path, content_type)
+      {{ctx}}.response.content_type = {{content_type}}
+      {% if flag?(:embed_web_assets) %}
+        {{ctx}}.response.print {{ read_file("#{__DIR__}/assets/" + path) }}
+      {% else %}
+        {{ctx}}.response.print File.read("#{__DIR__}/assets/" + {{path}})
+      {% end %}
+      {{ctx}}
+    end
+
     def draw_routes
       get "/" do |context, params|
-        jobs = Services::JobInfoService.get_all_jobs
+        jobs = Services::JobInfoService.get_all_jobs.map do |job|
+          job_data = Services::JobDataService.get_job(job.name)
+          last_execution_data = nil
+          if !job_data.nil?
+            last_execution_data = Services::JobDataService.get_execution(job.name, job_data.not_nil!.@last_execution_id)
+          end
+          {info: job, last_execution: last_execution_data}
+        end
         context.response.print Templates.run.home(jobs)
         context
       end
@@ -75,6 +93,10 @@ module Workr::Web::Server
         done.receive
         canceller.call()
         context
+      end
+
+      get "/style.css" do |context, params|
+        reply_asset context, "style.css", "text/css"
       end
     end
 

@@ -1,14 +1,34 @@
 <%- def home(jobs) -%>
-    <%- layouts__base do -%>
-        <b>Jobs: </b>
+    <%- layout_base do -%>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Job</th>
+                    <th>Last execution</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%- jobs.each do |job| -%>
+                    <%- job_info = job["info"] -%>
+                    <tr>
+                        <td>
+                            <a href="/job/<%= job_info.name %>">
+                                <%= job_info.name %>
+                            </a>
+                        </td>
+                        <td>
+                            <%- if !job["last_execution"].nil? -%>
+                                <%- last_execution = job["last_execution"].not_nil! -%>
+                                <a href="/job/<%= job_info.name %>/execution/<%= last_execution.id %>">#<%= last_execution.id %></a>
+                                <span class="last_execution_date">(<%= last_execution.start_date %>)</span>
+                            <%- end -%>
+                        </td>
+                    </tr>
+                <%- end -%>
+            </tbody>
+        </table>
         <ul>
-            <%- jobs.each do |job_info| -%>
-            <li>
-                <a href="/job/<%= job_info.name %>">
-                    <%= job_info.name %>
-                </a>
-            </li>
-            <%- end -%>
+            
         </ul>
     <%- end -%>
 <%- end -%>

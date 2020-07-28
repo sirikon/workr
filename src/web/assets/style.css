@@ -1,0 +1,56 @@
+body {
+    background-color: whitesmoke;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.container {
+    max-width: 800px;
+    display: block;
+    margin: auto;
+    box-sizing: border-box;
+    padding: 0 10px;
+}
+
+.header {
+    background-color: white;
+    padding: 1px 0;
+    box-shadow: 0px -10px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.header h1 a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.content {
+    padding: 10px 0;
+}
+
+.table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table table, .table th, .table td {
+    border: 3px solid whitesmoke;
+}
+
+.table th, .table td {
+    padding: 5px;
+}
+
+.table th {
+    text-align: left;
+    font-weight: 100;
+}
+
+.table td {
+    background-color: white;
+}
+
+.table .last_execution_date {
+    opacity: 0.4;
+}

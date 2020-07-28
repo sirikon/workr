@@ -1,12 +1,23 @@
-<%- def layouts__base -%>
+<%- def layout_base -%>
     <html>
         <head>
             <meta charset="utf8">
             <title>Workr</title>
+            <link rel="stylesheet" href="/style.css" />
         </head>
         <body>
-            <h1><a href="/">Workr</a></h1>
-            <%- yield -%>
+            <header class="header">
+                <div class="container">
+                    <h1><a href="/">Workr</a></h1>
+                </div>
+            </header>
+            
+            <div class="content">
+                <div class="container">
+                    <%- yield -%>
+                </div>
+            </div>
+            
         </body>
     </html>
 <%- end -%>

@@ -1,12 +1,6 @@
 <%- def job(job_info, job_executions) -%>
-    <html>
-        <head>
-            <meta charset="utf8">
-            <title>Workr: Job <%= job_info.name %></title>
-        </head>
-        <body>
-            <h1><a href="/">Workr</a></h1>
-            <h3>Job <%= job_info.name %></h3>
+    <%- layout_base do -%>
+        <h3>Job <%= job_info.name %></h3>
             <form method="post" action="/job/<%= job_info.name %>/run">
                 <input type="submit" value="Run" />
             </form>
@@ -20,6 +14,5 @@
                 </li>
                 <%- end -%>
             </ul>
-        </body>
-    </html>
+    <%- end -%>
 <%- end -%>
