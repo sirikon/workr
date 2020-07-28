@@ -5,7 +5,7 @@
     <body>
         <h1><a href="/">Workr</a></h1>
         <h3>
-            Execution <%= job_info.name %>#<%= job_execution.id %>:
+            Execution <a href="/job/<%= job_info.name %>"><%= job_info.name %></a>#<%= job_execution.id %>:
             <span id="job_execution_finished"><%= job_execution.finished ? "Finished" : "Running" %></span>
         </h3>
         <pre>
