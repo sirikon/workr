@@ -17,7 +17,7 @@ module Workr::Services::JobDataService
     write_job_data(job_info.name, job_data)
 
     ensure_job_execution_data_folder(job_info.name, job_data.@latest_execution_id)
-    job_execution_data = read_job_execution_data(job_info.name, job_data.@latest_execution_id)
+    job_execution_data = read_job_execution_data(job_info.name, job_data.@latest_execution_id).not_nil!
     job_execution_data.set_start_date(Time.utc)
     write_job_execution_data(job_info.name, job_data.@latest_execution_id, job_execution_data)
 
@@ -25,7 +25,7 @@ module Workr::Services::JobDataService
   end
 
   def finish_execution(job_name, job_execution_id, exit_code)
-    job_execution_data = read_job_execution_data(job_name, job_execution_id)
+    job_execution_data = read_job_execution_data(job_name, job_execution_id).not_nil!
     job_execution_data.set_end_date(Time.utc)
     job_execution_data.set_exit_code(exit_code)
     write_job_execution_data(job_name, job_execution_id, job_execution_data)
@@ -69,25 +69,29 @@ module Workr::Services::JobDataService
       .reject! { |id| !Dir.exists?(job_data_folder / id) }
       .map { |id| UInt32.new(id) }
       .sort.reverse
-      .map { |id|
-        job_execution_data = read_job_execution_data(job_name, id)
+      .map { |id| {id: id, data: read_job_execution_data(job_name, id)} }
+      .reject! { |job| job["data"].nil? }
+      .map { |job|
         Models::JobExecutionData.new(
-          id,
-          job_execution_data.@start_date,
-          job_execution_data.@end_date,
-          !job_execution_data.@end_date.nil?,
-          job_execution_data.@exit_code)
+          job["id"],
+          job["data"].not_nil!.@start_date,
+          job["data"].not_nil!.@end_date,
+          !job["data"].not_nil!.@end_date.nil?,
+          job["data"].not_nil!.@exit_code)
       }
   end
 
   def get_execution(job_name : String, job_execution_id : UInt32)
     job_execution_data = read_job_execution_data(job_name, job_execution_id)
+    if job_execution_data.nil?
+      return nil
+    end
     Models::JobExecutionData.new(
       job_execution_id,
-      job_execution_data.@start_date,
-      job_execution_data.@end_date,
-      !job_execution_data.@end_date.nil?,
-      job_execution_data.@exit_code)
+      job_execution_data.not_nil!.@start_date,
+      job_execution_data.not_nil!.@end_date,
+      !job_execution_data.not_nil!.@end_date.nil?,
+      job_execution_data.not_nil!.@exit_code)
   end
 
   def get_execution_output(job_name, job_execution_id)
@@ -194,7 +198,11 @@ module Workr::Services::JobDataService
   end
 
   private def read_job_execution_data(job_name, job_execution_id)
-    JobExecutionData.from_json(File.read(get_job_execution_data_folder(job_name, job_execution_id) / "data.json"))
+    data_path = get_job_execution_data_folder(job_name, job_execution_id) / "data.json"
+    if !File.exists?(data_path)
+      return nil
+    end
+    JobExecutionData.from_json(File.read(data_path))
   end
 
   private class JobData

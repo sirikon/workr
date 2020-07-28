@@ -47,7 +47,7 @@ module Workr::Web::Server
         job_info = Services::JobInfoService.get_job params["name"]
         job_execution = Services::JobDataService.get_execution job_name, job_execution_id
         job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
-        context.response.print Templates.run.job_execution(job_info, job_execution, job_execution_output)
+        context.response.print Templates.run.job_execution(job_info, job_execution.not_nil!, job_execution_output)
         context
       end
       post "/job/:name/run" do |context, params|
@@ -64,7 +64,10 @@ module Workr::Web::Server
         context.response.headers.add("Content-Type", "text/plain")
 
         job_execution = Services::JobDataService.get_execution job_name, job_execution_id
-        if job_execution.finished
+        if job_execution.nil?
+          next context
+        end
+        if job_execution.not_nil!.finished
           context.response.print Services::JobDataService.get_execution_output job_name, job_execution_id
           next context
         end
@@ -100,7 +103,7 @@ module Workr::Web::Server
         job_execution_id = UInt32.new(params["execution"])
         context.response.headers.add("Content-Type", "text/plain")
         job_execution = Services::JobDataService.get_execution job_name, job_execution_id
-        if job_execution.finished
+        if !job_execution.nil? && job_execution.not_nil!.finished
           context.response.print job_execution.exit_code
         end
         context
