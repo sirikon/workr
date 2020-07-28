@@ -4,19 +4,18 @@ module Workr::Web::Templates
   class TemplateExecutionContext
     property io : IO = IO::Memory.new
 
-    macro define_templates(*template_defs)
-      {% for template_def, index in template_defs %}
-        def {{template_def.first.id}}({% for fragment, index in template_def %}{% if index > 1 %},{% end %}{% if index != 0 %}{{ fragment.id }}{% end %}{% end %})
-          ECR.embed("#{__DIR__}/templates/" + {{ (template_def.first.id.gsub(/\_\_/, "/") + ".ecr").stringify }}, @io)
-        end
+    macro define_templates(*template_paths)
+      {% for template_path, index in template_paths %}
+        ECR.embed("#{__DIR__}/templates/" + {{ (template_path.id + ".ecr").stringify }}, @io)
       {% end %}
     end
 
     define_templates(
-      {"layouts__base", "&"},
-      {"home", "jobs"},
-      {"job", "job_info", "job_executions"},
-      {"job_execution", "job_info", "job_execution", "job_execution_output"})
+      "layouts/base",
+      "home",
+      "job",
+      "job_execution"
+    )
   end
 
   def run

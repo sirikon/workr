@@ -1,23 +1,25 @@
-<html>
-    <head>
-        <meta charset="utf8">
-        <title>Workr: Job <%= job_info.name %></title>
-    </head>
-    <body>
-        <h1><a href="/">Workr</a></h1>
-        <h3>Job <%= job_info.name %></h3>
-        <form method="post" action="/job/<%= job_info.name %>/run">
-            <input type="submit" value="Run" />
-        </form>
-        <b>Executions: </b>
-        <ul>
-            <%- job_executions.each do |job_execution| -%>
-            <li>
-                <a href="/job/<%= job_info.name %>/execution/<%= job_execution.id %>">
-                    <%= job_execution.id %>
-                </a>
-            </li>
-            <%- end -%>
-        </ul>
-    </body>
-</html>
+<%- def job(job_info, job_executions) -%>
+    <html>
+        <head>
+            <meta charset="utf8">
+            <title>Workr: Job <%= job_info.name %></title>
+        </head>
+        <body>
+            <h1><a href="/">Workr</a></h1>
+            <h3>Job <%= job_info.name %></h3>
+            <form method="post" action="/job/<%= job_info.name %>/run">
+                <input type="submit" value="Run" />
+            </form>
+            <b>Executions: </b>
+            <ul>
+                <%- job_executions.each do |job_execution| -%>
+                <li>
+                    <a href="/job/<%= job_info.name %>/execution/<%= job_execution.id %>">
+                        <%= job_execution.id %>
+                    </a>
+                </li>
+                <%- end -%>
+            </ul>
+        </body>
+    </html>
+<%- end -%>
