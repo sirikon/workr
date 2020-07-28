@@ -16,12 +16,12 @@ module Workr::Services::JobDataService
     job_data.increase_execution_id
     write_job_data(job_info.name, job_data)
 
-    ensure_job_execution_data_folder(job_info.name, job_data.@last_execution_id)
-    job_execution_data = read_job_execution_data(job_info.name, job_data.@last_execution_id)
+    ensure_job_execution_data_folder(job_info.name, job_data.@latest_execution_id)
+    job_execution_data = read_job_execution_data(job_info.name, job_data.@latest_execution_id)
     job_execution_data.set_start_date(Time.utc)
-    write_job_execution_data(job_info.name, job_data.@last_execution_id, job_execution_data)
+    write_job_execution_data(job_info.name, job_data.@latest_execution_id, job_execution_data)
 
-    return job_data.@last_execution_id
+    return job_data.@latest_execution_id
   end
 
   def finish_execution(job_name, job_execution_id, exit_code)
@@ -57,7 +57,7 @@ module Workr::Services::JobDataService
     if job_data.nil?
       return nil
     end
-    Models::JobData.new(job_name, job_data.not_nil!.@last_execution_id)
+    Models::JobData.new(job_name, job_data.not_nil!.@latest_execution_id)
   end
 
   def get_all_executions(job_name)
@@ -201,11 +201,11 @@ module Workr::Services::JobDataService
     include JSON::Serializable
 
     def initialize(
-      @last_execution_id : UInt32
+      @latest_execution_id : UInt32
     ); end
 
     def increase_execution_id
-      @last_execution_id = @last_execution_id + 1
+      @latest_execution_id = @latest_execution_id + 1
     end
   end
 

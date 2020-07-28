@@ -26,11 +26,11 @@ module Workr::Web::Server
       get "/" do |context, params|
         jobs = Services::JobInfoService.get_all_jobs.map do |job|
           job_data = Services::JobDataService.get_job(job.name)
-          last_execution_data = nil
+          latest_execution_data = nil
           if !job_data.nil?
-            last_execution_data = Services::JobDataService.get_execution(job.name, job_data.not_nil!.@last_execution_id)
+            latest_execution_data = Services::JobDataService.get_execution(job.name, job_data.not_nil!.@latest_execution_id)
           end
-          {info: job, last_execution: last_execution_data}
+          {info: job, latest_execution: latest_execution_data}
         end
         context.response.print Templates.run.home(jobs)
         context

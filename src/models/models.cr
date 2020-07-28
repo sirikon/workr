@@ -6,7 +6,7 @@ module Workr::Models
 
   record JobData,
     name : String,
-    last_execution_id : UInt32
+    latest_execution_id : UInt32
 
   record JobExecutionData,
     id : UInt32,

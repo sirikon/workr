@@ -4,7 +4,7 @@
             <thead>
                 <tr>
                     <th>Job</th>
-                    <th>Last execution</th>
+                    <th>Latest execution</th>
                 </tr>
             </thead>
             <tbody>
@@ -17,10 +17,10 @@
                             </a>
                         </td>
                         <td>
-                            <%- if !job["last_execution"].nil? -%>
-                                <%- last_execution = job["last_execution"].not_nil! -%>
-                                <a href="/job/<%= job_info.name %>/execution/<%= last_execution.id %>">#<%= last_execution.id %></a><div class="status_dot is-<%= last_execution.finished ? (last_execution.exit_code == 0 ? "finished" : "failed") : "running" %>"></div>
-                                <span class="execution_date">(<%= last_execution.start_date %>)</span>
+                            <%- if !job["latest_execution"].nil? -%>
+                                <%- latest_execution = job["latest_execution"].not_nil! -%>
+                                <a href="/job/<%= job_info.name %>/execution/<%= latest_execution.id %>">#<%= latest_execution.id %></a><div class="status_dot is-<%= latest_execution.finished ? (latest_execution.exit_code == 0 ? "finished" : "failed") : "running" %>"></div>
+                                <span class="execution_date">(<%= latest_execution.start_date %>)</span>
                             <%- end -%>
                         </td>
                     </tr>
