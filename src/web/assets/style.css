@@ -69,6 +69,12 @@ a {
     font-weight: normal;
 }
 
+.section_title form {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0 0 0 .5em;
+}
+
 .console_output {
     background-color: #3c3c3c;
     color: white;

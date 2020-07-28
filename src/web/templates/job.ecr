@@ -3,10 +3,10 @@
         <h3 class="section_title">
             Job
             <b><%= job_info.name %></b>
+            <form method="post" action="/job/<%= job_info.name %>/run">
+                <input type="submit" value="Execute" />
+            </form>
         </h3>
-        <form method="post" action="/job/<%= job_info.name %>/run">
-            <input type="submit" value="Execute" />
-        </form>
         <table class="table">
             <thead>
                 <tr>
