@@ -39,6 +39,43 @@ module Workr::Web::Server
         context.response.headers.add("Location", "/job/#{job_name}/execution/#{execution_id}")
         context
       end
+
+      get "/api/job/:name/execution/:execution/output_stream" do |context, params|
+        job_name = params["name"]
+        job_execution_id = UInt32.new(params["execution"])
+        context.response.headers.add("Content-Type", "text/plain")
+
+        job_execution = Services::JobDataService.get_execution job_name, job_execution_id
+        if job_execution.finished
+          context.response.print Services::JobDataService.get_execution_output job_name, job_execution_id
+          next context
+        end
+
+        done = Channel(Nil).new
+        canceller = Services::JobDataService.subscribe_execution_output job_name, job_execution_id do |bytes|
+          if (context.response.closed? || bytes.size == 0)
+            done.send(nil)
+            next
+          end
+
+          if !context.response.closed?
+            # Even after checking that the response is closed, it could raise
+            # an exception, so it needs handling
+            begin
+              context.response.write(bytes)
+              context.response.flush
+            rescue
+              done.send(nil)
+            end
+          else
+            done.send(nil)
+          end
+        end
+
+        done.receive
+        canceller.call()
+        context
+      end
     end
 
     def run

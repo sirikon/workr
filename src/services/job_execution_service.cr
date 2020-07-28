@@ -21,7 +21,6 @@ module Workr::Services::JobExecutionService
     job_execution_id = JobDataService.create_execution(job_info.name)
 
     output_reader, output_writer = IO.pipe()
-
     process = Process.new(
       command: job_info.entrypoint,
       output: output_writer,

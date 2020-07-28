@@ -1,5 +1,6 @@
 <html>
     <head>
+        <meta charset="utf8">
         <title>Workr: Job <%= job_info.name %></title>
     </head>
     <body>
@@ -8,8 +9,43 @@
             Execution <a href="/job/<%= job_info.name %>"><%= job_info.name %></a>#<%= job_execution.id %>:
             <span id="job_execution_finished"><%= job_execution.finished ? "Finished" : "Running" %></span>
         </h3>
-        <pre>
-            <%= job_execution_output %>
-        </pre>
+        <pre id="job_execution_output"><%= job_execution_output %></pre>
+
+        <%- if !job_execution.finished -%>
+            <script>
+                const output_element = document.getElementById('job_execution_output');
+                const status_element = document.getElementById('job_execution_finished');
+                let exiting = false;
+
+                window.addEventListener("beforeunload", function (event) {
+                    exiting = true;
+                });
+
+                function subscribe_output(job_name, job_execution_id) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', `/api/job/${job_name}/execution/${job_execution_id}/output_stream`);
+                    let byteCount = 0;
+                    let firstPacketReceived = false;
+
+                    xhr.onreadystatechange = function() {
+                        if(xhr.readyState >= 3) {
+                            if (!firstPacketReceived) {
+                                output_element.innerHTML = '';
+                                firstPacketReceived = true;
+                            }
+                            const receivedData = xhr.response.substr(byteCount);
+                            output_element.innerHTML += receivedData;
+                            byteCount = xhr.responseText.length;
+                        }
+                        if (xhr.readyState === 4 && !exiting) {
+                            status_element.innerHTML = 'Finished';
+                        }
+                    };
+                    xhr.addEventListener("error", (e) => console.log("Error", e));
+                    xhr.send();
+                }
+                subscribe_output("<%= job_info.name %>", "<%= job_execution.id %>")
+            </script>
+        <%- end -%>
     </body>
 </html>

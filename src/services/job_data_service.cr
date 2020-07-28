@@ -5,6 +5,17 @@ require "../models/models"
 module Workr::Services::JobDataService
   extend self
 
+  @@job_execution_output_subscribers = {} of String => Array(Bytes -> Nil)
+  @@job_execution_output_cache = {} of String => Array(Bytes)
+
+  spawn do
+    loop do
+      puts @@job_execution_output_subscribers
+      puts @@job_execution_output_cache
+      sleep 2
+    end
+  end
+
   def create_execution(job_name)
     job_info = JobInfoService.get_job(job_name)
 
@@ -40,7 +51,13 @@ module Workr::Services::JobDataService
       end
       yield ->(data : Bytes) {
         file.write(data)
+        send_output_to_subscribers(job_name, job_execution_id, data)
       }
+      file.fsync
+      send_output_to_subscribers(job_name, job_execution_id, Slice(UInt8).new(0))
+
+
+
       writing = false
     end
   end
@@ -76,6 +93,56 @@ module Workr::Services::JobDataService
   def get_execution_output(job_name, job_execution_id)
     job_execution_data_folder = get_job_execution_data_folder(job_name, job_execution_id)
     File.read(job_execution_data_folder / "output.log")
+  end
+
+  def subscribe_execution_output(job_name, job_execution_id, &subscriber : Bytes -> Nil)
+    job_execution_key = "#{job_name}##{job_execution_id}"
+
+    if !@@job_execution_output_subscribers.has_key?(job_execution_key)
+      @@job_execution_output_subscribers[job_execution_key] = [] of Bytes -> Nil
+    end
+    @@job_execution_output_subscribers[job_execution_key] << subscriber
+
+    if @@job_execution_output_cache.has_key?(job_execution_key)
+      @@job_execution_output_cache[job_execution_key].each do |bytes|
+        subscriber.call(bytes)
+      end
+    end
+
+    ->{
+      @@job_execution_output_subscribers[job_execution_key].delete(subscriber)
+      if @@job_execution_output_subscribers[job_execution_key].size == 0
+        @@job_execution_output_subscribers.delete(job_execution_key)
+      end
+    }
+  end
+
+  private def send_output_to_subscribers(job_name, job_execution_id, bytes)
+    job_execution_key = "#{job_name}##{job_execution_id}"
+
+    if (bytes.size > 0)
+      if !@@job_execution_output_cache.has_key?(job_execution_key)
+        @@job_execution_output_cache[job_execution_key] = [] of Bytes
+      end
+      @@job_execution_output_cache[job_execution_key] << bytes
+    else
+      if @@job_execution_output_cache.has_key?(job_execution_key)
+        @@job_execution_output_cache.delete(job_execution_key)
+      end
+    end
+
+    if !@@job_execution_output_subscribers.has_key?(job_execution_key)
+      return
+    end
+    @@job_execution_output_subscribers[job_execution_key].each do |subscriber|
+      spawn do
+        subscriber.call(bytes)
+      end
+    end
+
+    if (bytes.size == 0)
+      @@job_execution_output_subscribers[job_execution_key].clear
+    end
   end
 
   private def ensure_job_execution_data_folder(job_name, job_execution_id)
