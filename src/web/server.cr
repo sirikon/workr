@@ -62,6 +62,7 @@ module Workr::Web::Server
         job_name = params["name"]
         job_execution_id = UInt32.new(params["execution"])
         context.response.headers.add("Content-Type", "text/plain")
+        context.response.headers.add("X-Content-Type-Options", "nosniff")
 
         job_execution = Services::JobDataService.get_execution job_name, job_execution_id
         if job_execution.nil?
