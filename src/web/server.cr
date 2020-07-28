@@ -14,13 +14,13 @@ module Workr::Web::Server
     def draw_routes
       get "/" do |context, params|
         jobs = Services::JobInfoService.get_all_jobs
-        context.response.print Templates.home(jobs)
+        context.response.print Templates.run.home(jobs)
         context
       end
       get "/job/:name" do |context, params|
         job_info = Services::JobInfoService.get_job params["name"]
         job_executions = Services::JobDataService.get_all_executions(job_info.name)
-        context.response.print Templates.job(job_info, job_executions)
+        context.response.print Templates.run.job(job_info, job_executions)
         context
       end
       get "/job/:name/execution/:execution" do |context, params|
@@ -29,7 +29,7 @@ module Workr::Web::Server
         job_info = Services::JobInfoService.get_job params["name"]
         job_execution = Services::JobDataService.get_execution job_name, job_execution_id
         job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
-        context.response.print Templates.job_execution(job_info, job_execution, job_execution_output)
+        context.response.print Templates.run.job_execution(job_info, job_execution, job_execution_output)
         context
       end
       post "/job/:name/run" do |context, params|

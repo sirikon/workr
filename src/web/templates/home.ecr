@@ -1,19 +1,12 @@
-<html>
-    <head>
-        <meta charset="utf8">
-        <title>Workr</title>
-    </head>
-    <body>
-        <h1><a href="/">Workr</a></h1>
-        <b>Jobs: </b>
-        <ul>
-            <%- jobs.each do |job_info| -%>
-            <li>
-                <a href="/job/<%= job_info.name %>">
-                    <%= job_info.name %>
-                </a>
-            </li>
-            <%- end -%>
-        </ul>
-    </body>
-</html>
+<%- layouts__base() do -%>
+    <b>Jobs: </b>
+    <ul>
+        <%- jobs.each do |job_info| -%>
+        <li>
+            <a href="/job/<%= job_info.name %>">
+                <%= job_info.name %>
+            </a>
+        </li>
+        <%- end -%>
+    </ul>
+<%- end -%>
