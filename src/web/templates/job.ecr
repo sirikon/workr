@@ -5,6 +5,9 @@
     <body>
         <h1><a href="/">Workr</a></h1>
         <h3>Job <%= job_info.name %></h3>
+        <form method="post" action="/job/<%= job_info.name %>/run">
+            <input type="submit" value="Run" />
+        </form>
         <b>Executions: </b>
         <ul>
             <%- job_executions.each do |job_execution| -%>

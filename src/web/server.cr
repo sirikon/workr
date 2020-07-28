@@ -26,7 +26,8 @@ module Workr::Web::Server
       post "/job/:name/run" do |context, params|
         job_name = params["name"]
         execution_id = Services::JobExecutionService.run(job_name)
-        context.response.headers.add("Location", "/job/#{job_name}/execution/#{execution_id}}")
+        context.response.status = HTTP::Status::SEE_OTHER
+        context.response.headers.add("Location", "/job/#{job_name}/execution/#{execution_id}")
         context
       end
     end
