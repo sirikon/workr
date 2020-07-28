@@ -93,3 +93,6 @@ a {
 .execution_status_finished.is-finished {
     background-color: #009432;
 }
+.execution_status_finished.is-failed {
+    background-color: #EA2027;
+}

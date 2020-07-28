@@ -12,5 +12,6 @@ module Workr::Models
     id : UInt32,
     start_date : Time,
     end_date : Time?,
-    finished : Bool
+    finished : Bool,
+    exit_code : Int32?
 end

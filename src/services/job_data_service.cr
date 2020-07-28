@@ -24,9 +24,10 @@ module Workr::Services::JobDataService
     return job_data.@last_execution_id
   end
 
-  def finish_execution(job_name, job_execution_id)
+  def finish_execution(job_name, job_execution_id, exit_code)
     job_execution_data = read_job_execution_data(job_name, job_execution_id)
     job_execution_data.set_end_date(Time.utc)
+    job_execution_data.set_exit_code(exit_code)
     write_job_execution_data(job_name, job_execution_id, job_execution_data)
   end
 
@@ -74,7 +75,8 @@ module Workr::Services::JobDataService
           id,
           job_execution_data.@start_date,
           job_execution_data.@end_date,
-          !job_execution_data.@end_date.nil?)
+          !job_execution_data.@end_date.nil?,
+          job_execution_data.@exit_code)
       }
   end
 
@@ -84,7 +86,8 @@ module Workr::Services::JobDataService
       job_execution_id,
       job_execution_data.@start_date,
       job_execution_data.@end_date,
-      !job_execution_data.@end_date.nil?)
+      !job_execution_data.@end_date.nil?,
+      job_execution_data.@exit_code)
   end
 
   def get_execution_output(job_name, job_execution_id)
@@ -148,7 +151,7 @@ module Workr::Services::JobDataService
       return
     end
     Dir.mkdir_p(job_execution_data_folder)
-    write_job_execution_data(job_name, job_execution_id, JobExecutionData.new(Time.unix(0), nil))
+    write_job_execution_data(job_name, job_execution_id, JobExecutionData.new(Time.unix(0), nil, nil))
     File.touch(job_execution_data_folder / "output.log")
   end
 
@@ -211,7 +214,8 @@ module Workr::Services::JobDataService
 
     def initialize(
       @start_date : Time,
-      @end_date : Time?
+      @end_date : Time?,
+      @exit_code : Int32?
     ); end
 
     def set_start_date(date)
@@ -220,6 +224,10 @@ module Workr::Services::JobDataService
 
     def set_end_date(date)
       @end_date = date
+    end
+
+    def set_exit_code(exit_code)
+      @exit_code = exit_code
     end
   end
 end

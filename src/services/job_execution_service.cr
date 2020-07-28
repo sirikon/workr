@@ -45,10 +45,10 @@ module Workr::Services::JobExecutionService
     end
 
     spawn do
-      process.wait
+      process_status = process.wait
       process_finished.send(nil)
       output_finished.receive
-      JobDataService.finish_execution job_info.@name, job_execution_id
+      JobDataService.finish_execution job_info.@name, job_execution_id, process_status.exit_status
       done.send(nil)
     end
 

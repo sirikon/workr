@@ -3,8 +3,8 @@
         <h3 class="section_title">
             Execution
             <b><a href="/job/<%= job_info.name %>"><%= job_info.name %></a>#<%= job_execution.id %></b>
-            <span id="job_execution_finished" class="execution_status_finished is-<%= job_execution.finished ? "finished" : "running" %>">
-                <%= job_execution.finished ? "Finished" : "Running" %>
+            <span id="job_execution_finished" class="execution_status_finished is-<%= job_execution.finished ? (job_execution.exit_code == 0 ? "finished" : "failed") : "running" %>">
+                <%= job_execution.finished ? (job_execution.exit_code == 0 ? "Finished" : "Failed") : "Running" %>
             </span>
         </h3>
 
@@ -37,14 +37,34 @@
                             byteCount = xhr.responseText.length;
                         }
                         if (xhr.readyState === 4 && !exiting) {
-                            status_element.classList.remove("is-running");
-                            status_element.classList.add("is-finished");
-                            status_element.innerHTML = 'Finished';
+                            check_exit_code(job_name, job_execution_id);
                         }
                     };
                     xhr.addEventListener("error", (e) => console.log("Error", e));
                     xhr.send();
                 }
+
+                function check_exit_code(job_name, job_execution_id) {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', `/api/job/${job_name}/execution/${job_execution_id}/exit_code`);
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            if (xhr.response === '') { return; }
+                            status_element.classList.remove("is-running");
+                            const exit_code = parseInt(xhr.response);
+                            if (exit_code === 0) {
+                                status_element.classList.add("is-finished");
+                                status_element.innerHTML = 'Finished';
+                            } else {
+                                status_element.classList.add("is-failed");
+                                status_element.innerHTML = 'Failed';
+                            }
+                        }
+                    };
+                    xhr.addEventListener("error", (e) => console.log("Error", e));
+                    xhr.send();
+                }
+
                 subscribe_output("<%= job_info.name %>", "<%= job_execution.id %>")
             </script>
         <%- end -%>

@@ -95,6 +95,17 @@ module Workr::Web::Server
         context
       end
 
+      get "/api/job/:name/execution/:execution/exit_code" do |context, params|
+        job_name = params["name"]
+        job_execution_id = UInt32.new(params["execution"])
+        context.response.headers.add("Content-Type", "text/plain")
+        job_execution = Services::JobDataService.get_execution job_name, job_execution_id
+        if job_execution.finished
+          context.response.print job_execution.exit_code
+        end
+        context
+      end
+
       get "/style.css" do |context, params|
         reply_asset context, "style.css", "text/css"
       end
