@@ -1,10 +1,14 @@
 <%- def job_execution(job_info, job_execution, job_execution_output) -%>
     <%- layout_base do -%>
-        <h3>
-            Execution <a href="/job/<%= job_info.name %>"><%= job_info.name %></a>#<%= job_execution.id %>:
-            <span id="job_execution_finished"><%= job_execution.finished ? "Finished" : "Running" %></span>
+        <h3 class="section_title">
+            Execution
+            <b><a href="/job/<%= job_info.name %>"><%= job_info.name %></a>#<%= job_execution.id %></b>
+            <span id="job_execution_finished" class="execution_status_finished is-<%= job_execution.finished ? "finished" : "running" %>">
+                <%= job_execution.finished ? "Finished" : "Running" %>
+            </span>
         </h3>
-        <pre id="job_execution_output"><%= job_execution_output %></pre>
+
+        <pre class="console_output" id="job_execution_output"><%= job_execution_output %></pre>
 
         <%- if !job_execution.finished -%>
             <script>
@@ -33,6 +37,8 @@
                             byteCount = xhr.responseText.length;
                         }
                         if (xhr.readyState === 4 && !exiting) {
+                            status_element.classList.remove("is-running");
+                            status_element.classList.add("is-finished");
                             status_element.innerHTML = 'Finished';
                         }
                     };

@@ -20,7 +20,7 @@
                             <%- if !job["last_execution"].nil? -%>
                                 <%- last_execution = job["last_execution"].not_nil! -%>
                                 <a href="/job/<%= job_info.name %>/execution/<%= last_execution.id %>">#<%= last_execution.id %></a>
-                                <span class="last_execution_date">(<%= last_execution.start_date %>)</span>
+                                <span class="execution_date">(<%= last_execution.start_date %>)</span>
                             <%- end -%>
                         </td>
                     </tr>

@@ -6,6 +6,10 @@ body {
     overflow-y: scroll;
 }
 
+a {
+    text-decoration: none;
+}
+
 .container {
     max-width: 800px;
     display: block;
@@ -18,6 +22,10 @@ body {
     background-color: white;
     padding: 1px 0;
     box-shadow: 0px -10px 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.header h1 {
+    font-weight: normal;
 }
 
 .header h1 a {
@@ -34,8 +42,10 @@ body {
     width: 100%;
 }
 
-.table table, .table th, .table td {
-    border: 3px solid whitesmoke;
+.table tr {
+    border-bottom: 3px solid whitesmoke;
+    border-radius: 3px;
+    overflow: hidden;
 }
 
 .table th, .table td {
@@ -51,6 +61,35 @@ body {
     background-color: white;
 }
 
-.table .last_execution_date {
+.table .execution_date {
     opacity: 0.4;
+}
+
+.section_title {
+    font-weight: normal;
+}
+
+.console_output {
+    background-color: #3c3c3c;
+    color: white;
+    padding: 20px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.29);
+    border-radius: 3px;
+}
+
+.execution_status_finished {
+    font-weight: bold;
+    color: white;
+    padding: .3em .5em;
+    border-radius: 3px;
+    font-size: 0.7em;
+    vertical-align: middle;
+}
+
+/* https://flatuicolors.com/palette/nl */
+.execution_status_finished.is-running {
+    background-color: #5758BB;
+}
+.execution_status_finished.is-finished {
+    background-color: #009432;
 }

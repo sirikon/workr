@@ -1,18 +1,33 @@
 <%- def job(job_info, job_executions) -%>
     <%- layout_base do -%>
-        <h3>Job <%= job_info.name %></h3>
-            <form method="post" action="/job/<%= job_info.name %>/run">
-                <input type="submit" value="Run" />
-            </form>
-            <b>Executions: </b>
-            <ul>
+        <h3 class="section_title">
+            Job
+            <b><%= job_info.name %></b>
+        </h3>
+        <form method="post" action="/job/<%= job_info.name %>/run">
+            <input type="submit" value="Execute" />
+        </form>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Execution</th>
+                    <th>Start date</th>
+                </tr>
+            </thead>
+            <tbody>
                 <%- job_executions.each do |job_execution| -%>
-                <li>
-                    <a href="/job/<%= job_info.name %>/execution/<%= job_execution.id %>">
-                        <%= job_execution.id %>
-                    </a>
-                </li>
+                    <tr>
+                        <td>
+                            <a href="/job/<%= job_info.name %>/execution/<%= job_execution.id %>">
+                                #<%= job_execution.id %>
+                            </a>
+                        </td>
+                        <td>
+                            <span class="execution_date"><%= job_execution.start_date %></span>
+                        </td>
+                    </tr>
                 <%- end -%>
-            </ul>
+            </tbody>
+        </table>
     <%- end -%>
 <%- end -%>
