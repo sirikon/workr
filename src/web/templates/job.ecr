@@ -1,5 +1,5 @@
 <%- def job(job_info, job_executions) -%>
-    <%- layout_base do -%>
+    <%- layout_base(title: "Job #{job_info.name}") do -%>
         <h3 class="section_title">
             Job
             <b><%= job_info.name %></b>

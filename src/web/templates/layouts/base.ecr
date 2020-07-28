@@ -1,8 +1,8 @@
-<%- def layout_base -%>
+<%- def layout_base(title = "") -%>
     <html>
         <head>
             <meta charset="utf8">
-            <title>Workr</title>
+            <title>Workr<%= title == "" ? "" : " | #{title}" %></title>
             <link rel="stylesheet" href="/style.css" />
         </head>
         <body>
