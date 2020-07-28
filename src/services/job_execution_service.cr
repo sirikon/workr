@@ -20,7 +20,7 @@ module Workr::Services::JobExecutionService
     job_info = JobInfoService.get_job(job_name)
     job_execution_id = JobDataService.create_execution(job_info.name)
 
-    output_reader, output_writer = IO.pipe(write_blocking: true)
+    output_reader, output_writer = IO.pipe()
 
     process = Process.new(
       command: job_info.entrypoint,
@@ -49,6 +49,7 @@ module Workr::Services::JobExecutionService
       process.wait
       process_finished.send(nil)
       output_finished.receive
+      JobDataService.finish_execution job_info.@name, job_execution_id
       done.send(nil)
     end
 

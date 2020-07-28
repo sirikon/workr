@@ -7,16 +7,27 @@ module Workr::Services::JobDataService
 
   def create_execution(job_name)
     job_info = JobInfoService.get_job(job_name)
-    ensure_job_data_folder(job_info.name)
 
+    ensure_job_data_folder(job_info.name)
     job_data = read_job_data(job_info.name)
     job_data.increase_execution_id
     write_job_data(job_info.name, job_data)
 
+    ensure_job_execution_data_folder(job_info.name, job_data.@last_execution_id)
+    job_execution_data = read_job_execution_data(job_info.name, job_data.@last_execution_id)
+    job_execution_data.set_start_date(Time.utc)
+    write_job_execution_data(job_info.name, job_data.@last_execution_id, job_execution_data)
+
     return job_data.@last_execution_id
   end
 
-  def write_execution_output(job_name, job_execution_id)
+  def finish_execution(job_name, job_execution_id)
+    job_execution_data = read_job_execution_data(job_name, job_execution_id)
+    job_execution_data.set_end_date(Time.utc)
+    write_job_execution_data(job_name, job_execution_id, job_execution_data)
+  end
+
+  def write_execution_output(job_name : String, job_execution_id : UInt32)
     ensure_job_execution_data_folder(job_name, job_execution_id)
     job_execution_data_folder = get_job_execution_data_folder(job_name, job_execution_id)
     File.open job_execution_data_folder / "output.log", mode: "a" do |file|
@@ -27,7 +38,7 @@ module Workr::Services::JobDataService
           sleep 2
         end
       end
-      yield ->(data: Bytes){
+      yield ->(data : Bytes) {
         file.write(data)
       }
       writing = false
@@ -43,7 +54,23 @@ module Workr::Services::JobDataService
       .reject! { |id| !Dir.exists?(job_data_folder / id) }
       .map { |id| UInt32.new(id) }
       .sort.reverse
-      .map { |id| Models::JobExecutionData.new(id) }
+      .map { |id|
+        job_execution_data = read_job_execution_data(job_name, id)
+        Models::JobExecutionData.new(
+          id,
+          job_execution_data.@start_date,
+          job_execution_data.@end_date,
+          !job_execution_data.@end_date.nil?)
+      }
+  end
+
+  def get_execution(job_name : String, job_execution_id : UInt32)
+    job_execution_data = read_job_execution_data(job_name, job_execution_id)
+    Models::JobExecutionData.new(
+      job_execution_id,
+      job_execution_data.@start_date,
+      job_execution_data.@end_date,
+      !job_execution_data.@end_date.nil?)
   end
 
   def get_execution_output(job_name, job_execution_id)
@@ -57,6 +84,7 @@ module Workr::Services::JobDataService
       return
     end
     Dir.mkdir_p(job_execution_data_folder)
+    write_job_execution_data(job_name, job_execution_id, JobExecutionData.new(Time.unix(0), nil))
     File.touch(job_execution_data_folder / "output.log")
   end
 
@@ -90,14 +118,40 @@ module Workr::Services::JobDataService
     JobData.from_json(File.read(get_job_data_folder(job_name) / "data.json"))
   end
 
+  private def write_job_execution_data(job_name, job_execution_id, job_execution_data)
+    File.write(get_job_execution_data_folder(job_name, job_execution_id) / "data.json", job_execution_data.to_json)
+  end
+
+  private def read_job_execution_data(job_name, job_execution_id)
+    JobExecutionData.from_json(File.read(get_job_execution_data_folder(job_name, job_execution_id) / "data.json"))
+  end
+
   private class JobData
     include JSON::Serializable
 
-    def initialize(@last_execution_id : UInt32); end
+    def initialize(
+      @last_execution_id : UInt32
+    ); end
 
     def increase_execution_id
       @last_execution_id = @last_execution_id + 1
     end
   end
 
+  private class JobExecutionData
+    include JSON::Serializable
+
+    def initialize(
+      @start_date : Time,
+      @end_date : Time?
+    ); end
+
+    def set_start_date(date)
+      @start_date = date
+    end
+
+    def set_end_date(date)
+      @end_date = date
+    end
+  end
 end

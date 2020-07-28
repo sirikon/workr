@@ -27,8 +27,9 @@ module Workr::Web::Server
         job_name = params["name"]
         job_execution_id = UInt32.new(params["execution"])
         job_info = Services::JobInfoService.get_job params["name"]
+        job_execution = Services::JobDataService.get_execution job_name, job_execution_id
         job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
-        context.response.print Templates.job_execution(job_info, job_execution_id, job_execution_output)
+        context.response.print Templates.job_execution(job_info, job_execution, job_execution_output)
         context
       end
       post "/job/:name/run" do |context, params|

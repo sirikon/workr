@@ -4,7 +4,10 @@
     </head>
     <body>
         <h1><a href="/">Workr</a></h1>
-        <h3>Execution <%= job_info.name %>#<%= job_execution_id %></h3>
+        <h3>
+            Execution <%= job_info.name %>#<%= job_execution.id %>:
+            <span id="job_execution_finished"><%= job_execution.finished ? "Finished" : "Running" %></span>
+        </h3>
         <pre>
             <%= job_execution_output %>
         </pre>

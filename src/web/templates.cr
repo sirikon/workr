@@ -13,7 +13,7 @@ module Workr::Web::Templates
     render "job"
   end
 
-  def job_execution(job_info, job_execution_id, job_execution_output)
+  def job_execution(job_info, job_execution, job_execution_output)
     render "job_execution"
   end
 
