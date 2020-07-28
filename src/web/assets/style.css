@@ -86,13 +86,24 @@ a {
     vertical-align: middle;
 }
 
+.status_dot {
+    display: inline-block;
+    vertical-align: middle;
+    background-color: gray;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-bottom: .2em;
+    margin-left: .15em;
+}
+
 /* https://flatuicolors.com/palette/nl */
-.execution_status_finished.is-running {
+.execution_status_finished.is-running, .status_dot.is-running {
     background-color: #5758BB;
 }
-.execution_status_finished.is-finished {
+.execution_status_finished.is-finished, .status_dot.is-finished {
     background-color: #009432;
 }
-.execution_status_finished.is-failed {
+.execution_status_finished.is-failed, .status_dot.is-failed {
     background-color: #EA2027;
 }

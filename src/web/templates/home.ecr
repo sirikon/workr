@@ -19,7 +19,7 @@
                         <td>
                             <%- if !job["last_execution"].nil? -%>
                                 <%- last_execution = job["last_execution"].not_nil! -%>
-                                <a href="/job/<%= job_info.name %>/execution/<%= last_execution.id %>">#<%= last_execution.id %></a>
+                                <a href="/job/<%= job_info.name %>/execution/<%= last_execution.id %>">#<%= last_execution.id %></a><div class="status_dot is-<%= last_execution.finished ? (last_execution.exit_code == 0 ? "finished" : "failed") : "running" %>"></div>
                                 <span class="execution_date">(<%= last_execution.start_date %>)</span>
                             <%- end -%>
                         </td>
