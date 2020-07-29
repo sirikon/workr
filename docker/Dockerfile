@@ -6,5 +6,7 @@ COPY ./shard.yml .
 COPY ./shard.lock .
 RUN shards
 COPY ./src ./src
+RUN shards
+RUN crystal spec
 RUN shards build -Dembed_web_assets --release --static
 RUN strip bin/workr

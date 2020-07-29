@@ -1,0 +1,70 @@
+## Cloning repository...
+From https://github.com/sirikon/workr
+   33ec1f4..199c704  master     -> origin/master
+Updating 33ec1f4..199c704
+Fast-forward
+ shard.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+## Running release...
+## Building Workr...
+Creating network "docker_default" with the default driver
+Building builder
+Step 1/10 : FROM alpine:3.12
+ ---> a24bb4013296
+Step 2/10 : RUN sed -i -e 's/v[[:digit:]]\..*\//edge\//g' /etc/apk/repositories
+ ---> Using cache
+ ---> 9849c12ccbe8
+Step 3/10 : RUN apk add --update --no-cache crystal=0.35.1-r0 shards=0.11.1-r1 musl-dev zlib-dev zlib-static libressl-dev
+ ---> Using cache
+ ---> 54c19188314a
+Step 4/10 : WORKDIR /builder
+ ---> Using cache
+ ---> 655c45f76536
+Step 5/10 : COPY ./shard.yml .
+ ---> 3fffcdd75f44
+Step 6/10 : COPY ./shard.lock .
+ ---> 29c3a3bee9e5
+Step 7/10 : RUN shards
+ ---> Running in f7c38447de95
+[32mResolving[0m dependencies
+[32mFetching[0m https://github.com/tbrand/router.cr.git
+[32mFetching[0m https://github.com/luislavena/radix.git
+[32mInstalling[0m radix (0.3.9)
+[32mInstalling[0m router (0.2.7)
+Removing intermediate container f7c38447de95
+ ---> 2a888cf13177
+Step 8/10 : COPY ./src ./src
+ ---> 847cd6f324af
+Step 9/10 : RUN shards build -Dembed_web_assets --release --static
+ ---> Running in 6a338f90c1e1
+[32mDependencies[0m are satisfied
+[32mBuilding:[0m workr
+Removing intermediate container 6a338f90c1e1
+ ---> 3ae7559f1b01
+Step 10/10 : RUN strip bin/workr
+ ---> Running in 82153ac8ab3e
+Removing intermediate container 82153ac8ab3e
+ ---> 3a3f890fc0f5
+
+Successfully built 3a3f890fc0f5
+Successfully tagged workr-builder:latest
+Creating docker_builder_1 ... 
+[1A[2KCreating docker_builder_1 ... [32mdone[0m[1BAttaching to docker_builder_1
+docker_builder_1 exited with code 0
+Removing docker_builder_run_f267bc79822b ... 
+Removing docker_builder_1                ... 
+[1A[2KRemoving docker_builder_1                ... [32mdone[0m[1B[2A[2KRemoving docker_builder_run_f267bc79822b ... [32mdone[0m[2BRemoving network docker_default
+
+## Packaging into .tar.gz file
+
+## Packaging into deb file
+dpkg-deb: building package 'workr' in 'workr.deb'.
+
+## Creating release
+
+Uploading workr-0.1.3-linux-amd64.tar.gz... OK
+Uploading workr-0.1.3-linux-amd64.deb... OK
+
+Download link:
+https://github.com/sirikon/workr/releases/download/v0.1.3/workr-0.1.3-linux-amd64.deb
