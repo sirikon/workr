@@ -49,7 +49,8 @@ module Workr::Web::Server
         job_info = Services::JobInfoService.get_job params["name"]
         job_execution = Services::JobDataService.get_execution job_name, job_execution_id
         job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
-        context.response.print Templates.run.job_execution(job_info, job_execution.not_nil!, Utils::AnsiFilter.new.filter(job_execution_output))
+        ansi_filter = Utils::AnsiFilter.new
+        context.response.print Templates.run.job_execution(job_info, job_execution.not_nil!, ansi_filter.filter(job_execution_output))
         context
       end
       post "/job/:name/run" do |context, params|
@@ -75,8 +76,8 @@ module Workr::Web::Server
           next context
         end
 
-        done = Channel(Nil).new
         ansi_filter = Utils::AnsiFilter.new
+        done = Channel(Nil).new
         canceller = Services::JobDataService.subscribe_execution_output job_name, job_execution_id do |bytes|
           if (context.response.closed? || bytes.size == 0)
             done.send(nil)
