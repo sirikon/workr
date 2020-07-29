@@ -3,6 +3,7 @@ const init = (function(job_name, job_execution_id){
     const status_el = document.getElementById('job_execution_finished');
     const keep_body_on_bottom_threshold = 0;
     let output_last_line_el = null;
+    let previous_char_is_carriage_return = false;
     let exiting = false;
     let done = false;
     let firstByteReceived = false;
@@ -59,9 +60,13 @@ const init = (function(job_name, job_execution_id){
 
         const keepBodyOnBottom = document.body.scrollTop + keep_body_on_bottom_threshold >= getBodyScrollTopMax();
 
-        for (let i = 0; i < data.length; i++) {
-            const char = data[i];
-            if (char === '\n') {
+        for (const char of data) {
+            if (char === '\r') {
+                previous_char_is_carriage_return = true;
+                continue;
+            }
+
+            if (previous_char_is_carriage_return || char === '\n') {
                 // If the previous line is empty, insert a newline in it, so it has
                 // a minimal height when displayed.
                 if (output_last_line_el.textContent.length === 0) {
@@ -69,9 +74,13 @@ const init = (function(job_name, job_execution_id){
                 }
                 output_last_line_el = document.createElement('pre');
                 output_el.appendChild(output_last_line_el);
-            } else {
+            }
+
+            if (char !== '\n') {
                 output_last_line_el.textContent += char;
             }
+
+            previous_char_is_carriage_return = false;
         }
 
         if (keepBodyOnBottom) {
