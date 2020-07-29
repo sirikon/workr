@@ -73,15 +73,14 @@ const init = (function(job_name, job_execution_id){
                 continue;
             }
 
-            if (char === '\r') {
-                new_output_line();
-                continue;
-            }
-
-            // \r\r
             if (dangling_carriage_return) {
                 new_output_line();
                 dangling_carriage_return = false;
+            }
+
+            if (char === '\r') {
+                new_output_line();
+                continue;
             }
             
             output_last_line_el.textContent += char;
