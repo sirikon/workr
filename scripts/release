@@ -1,18 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "${BASH_SOURCE[0]}")/.."
+ROOT="$(realpath "$(dirname "${BASH_SOURCE[0]}")"/..)"
+cd "${ROOT}"
 
 USER="sirikon"
 REPO="workr"
-
 TEMP_FOLDER="./tmp"
 
 function main {
     create-temp-folder
 
     build-workr
-    TAR_PACKAGE_FILE="${TEMP_FOLDER}/workr-${VERSION}-linux-amd64.tar.gz"
-    DEB_PACKAGE_FILE="${TEMP_FOLDER}/workr-${VERSION}-linux-amd64.deb"
     package-tar
     package-deb
 
@@ -25,52 +23,53 @@ function main {
 }
 
 function build-workr {
-    printf "%s\n" "Building Workr..."
-    rm -rf ./bin
-    mkdir -p ./bin
+    log "Building Workr..."
     ./scripts/build-static
-    cp ./docker/workr ./bin/workr
-    export VERSION="$(get-builded-version)"
-    printf "%s\n" " OK"
+    mkdir -p /bin
+    rm -rf ./bin/*
+    cp ./docker/out/workr ./bin/workr
+    new-line
 }
 
 function get-builded-version {(
-    cd ./docker
-    docker-compose run builder shards version | tr -d '\n'
+    cd "${ROOT}"
+    tr -d '\n' < ./docker/out/version
 )}
 
 function package-tar {
-    printf "Packaging into .tar.gz file..."
+    log "Packaging into .tar.gz file"
+    TAR_PACKAGE_FILE="${TEMP_FOLDER}/workr-$(get-builded-version)-linux-amd64.tar.gz"
     (
         cd ./bin
         tar --create --gzip --file "../${TAR_PACKAGE_FILE}" *
     )
-    printf " OK\n"
+    new-line
 }
 
 function package-deb {(
-    printf "Packaging into deb file..."
+    log "Packaging into deb file"
+    DEB_PACKAGE_FILE="${TEMP_FOLDER}/workr-$(get-builded-version)-linux-amd64.deb"
     mkdir -p pkg/deb/workr/usr/bin/
     cp ./bin/* pkg/deb/workr/usr/bin/
     (
         cd pkg/deb
         mkdir -p workr/DEBIAN
-        export VERSION=${VERSION}
+        export VERSION=$(get-builded-version)
         envsubst < assets/control > workr/DEBIAN/control
         dpkg-deb --build workr
         mv ./workr.deb "../../${DEB_PACKAGE_FILE}"
     )
-    printf " OK\n"
+    new-line
 )}
 
 function create-release {
-    printf "Creating release..."
+    log "Creating release"
     github-release release \
         --user "${USER}" \
         --repo "${REPO}" \
-        --tag "v${VERSION}" \
-        --name "Workr ${VERSION}"
-    printf " OK\n"
+        --tag "v$(get-builded-version)" \
+        --name "Workr $(get-builded-version)"
+    new-line
 }
 
 function upload-file {
@@ -80,7 +79,7 @@ function upload-file {
     github-release upload \
         --user "${USER}" \
         --repo "${REPO}" \
-        --tag "v${VERSION}" \
+        --tag "v$(get-builded-version)" \
         --name "${fileName}" \
         --file "${file}"
     printf " OK\n"
@@ -95,17 +94,12 @@ function remove-temp-folder {
     rm -rf "${TEMP_FOLDER}"
 }
 
-function run-silent {
-    set +e
-    output=$("$@" 2>&1)
-    result=$?
-    set -e
-    if [ "$result" -gt "0" ]; then
-        echo "Error while running command:"
-        echo "$*"
-        printf "%s\n" "$output"
-        exit "$result"
-    fi
+function log {
+    printf "## %s\n" "$1"
+}
+
+function new-line {
+    printf "\n"
 }
 
 main "$@"
