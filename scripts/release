@@ -11,6 +11,10 @@ function main {
     create-temp-folder
 
     build-workr
+
+    TAR_PACKAGE_FILE="${TEMP_FOLDER}/workr-$(get-builded-version)-linux-amd64.tar.gz"
+    DEB_PACKAGE_FILE="${TEMP_FOLDER}/workr-$(get-builded-version)-linux-amd64.deb"
+
     package-tar
     package-deb
 
@@ -38,7 +42,6 @@ function get-builded-version {(
 
 function package-tar {
     log "Packaging into .tar.gz file"
-    TAR_PACKAGE_FILE="${TEMP_FOLDER}/workr-$(get-builded-version)-linux-amd64.tar.gz"
     (
         cd ./bin
         tar --create --gzip --file "../${TAR_PACKAGE_FILE}" *
@@ -48,7 +51,6 @@ function package-tar {
 
 function package-deb {(
     log "Packaging into deb file"
-    DEB_PACKAGE_FILE="${TEMP_FOLDER}/workr-$(get-builded-version)-linux-amd64.deb"
     mkdir -p pkg/deb/workr/usr/bin/
     cp ./bin/* pkg/deb/workr/usr/bin/
     (
