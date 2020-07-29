@@ -13,6 +13,7 @@ module Workr::Web::Server
     include Router
 
     macro reply_asset(ctx, path, content_type)
+      {{ctx}}.response.headers.add("Cache-Control", "max-age=3600")
       {{ctx}}.response.content_type = {{content_type}}
       {% if flag?(:embed_web_assets) %}
         {{ctx}}.response.print {{ read_file("#{__DIR__}/assets/" + path) }}
