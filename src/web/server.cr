@@ -1,6 +1,5 @@
 require "router"
 require "ecr"
-require "./utils"
 require "../services/job_info_service"
 require "../services/job_data_service"
 require "../services/job_execution_service"
@@ -49,8 +48,7 @@ module Workr::Web::Server
         job_info = Services::JobInfoService.get_job params["name"]
         job_execution = Services::JobDataService.get_execution job_name, job_execution_id
         job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
-        ansi_filter = Utils::AnsiFilter.new
-        context.response.print Templates.run.job_execution(job_info, job_execution.not_nil!, ansi_filter.filter(job_execution_output))
+        context.response.print Templates.run.job_execution(job_info, job_execution.not_nil!, job_execution_output)
         context
       end
       post "/job/:name/run" do |context, params|
@@ -76,7 +74,6 @@ module Workr::Web::Server
           next context
         end
 
-        ansi_filter = Utils::AnsiFilter.new
         done = Channel(Nil).new
         canceller = Services::JobDataService.subscribe_execution_output job_name, job_execution_id do |bytes|
           if (context.response.closed? || bytes.size == 0)
@@ -88,7 +85,7 @@ module Workr::Web::Server
             # Even after checking that the response is closed, it could raise
             # an exception, so it needs handling
             begin
-              context.response.write(ansi_filter.filter(bytes))
+              context.response.write(bytes)
               context.response.flush
             rescue
               done.send(nil)
