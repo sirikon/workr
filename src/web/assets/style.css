@@ -81,6 +81,7 @@ a {
     padding: 20px;
     box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.29);
     border-radius: 3px;
+    white-space: break-spaces;
 }
 
 .execution_status_finished {

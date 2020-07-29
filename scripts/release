@@ -4,17 +4,15 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 USER="sirikon"
 REPO="workr"
-VERSION="$(shards version | tr -d '\n')"
 
 TEMP_FOLDER="./tmp"
-TAR_PACKAGE_FILE="${TEMP_FOLDER}/workr-${VERSION}-linux-amd64.tar.gz"
-DEB_PACKAGE_FILE="${TEMP_FOLDER}/workr-${VERSION}-linux-amd64.deb"
 
 function main {
     create-temp-folder
 
     build-workr
-
+    TAR_PACKAGE_FILE="${TEMP_FOLDER}/workr-${VERSION}-linux-amd64.tar.gz"
+    DEB_PACKAGE_FILE="${TEMP_FOLDER}/workr-${VERSION}-linux-amd64.deb"
     package-tar
     package-deb
 
@@ -27,13 +25,19 @@ function main {
 }
 
 function build-workr {
-    printf "%s\n" "Building Workr ${VERSION}..."
+    printf "%s\n" "Building Workr..."
     rm -rf ./bin
     mkdir -p ./bin
     ./scripts/build-static
     cp ./docker/workr ./bin/workr
+    export VERSION="$(get-builded-version)"
     printf "%s\n" " OK"
 }
+
+function get-builded-version {(
+    cd ./docker
+    docker-compose run builder shards version | tr -d '\n'
+)}
 
 function package-tar {
     printf "Packaging into .tar.gz file..."
