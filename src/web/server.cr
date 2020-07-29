@@ -114,6 +114,9 @@ module Workr::Web::Server
       get "/style.css" do |context, params|
         reply_asset context, "style.css", "text/css"
       end
+      get "/job_execution.js" do |context, params|
+        reply_asset context, "job_execution.js", "text/javascript"
+      end
     end
 
     def run

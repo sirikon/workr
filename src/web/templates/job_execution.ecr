@@ -8,64 +8,14 @@
             </span>
         </h3>
 
-        <pre class="console_output" id="job_execution_output"><%= job_execution_output %></pre>
+        <div class="console_output" id="job_execution_output">
+            <pre><%= job_execution_output %></pre>
+        </div>
 
         <%- if !job_execution.finished -%>
+            <script type="text/javascript" src="/job_execution.js"></script>
             <script>
-                const output_element = document.getElementById('job_execution_output');
-                const status_element = document.getElementById('job_execution_finished');
-                let exiting = false;
-
-                window.addEventListener("beforeunload", function (event) {
-                    exiting = true;
-                });
-
-                function subscribe_output(job_name, job_execution_id) {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', `/api/job/${job_name}/execution/${job_execution_id}/output_stream`);
-                    let byteCount = 0;
-                    let firstPacketReceived = false;
-
-                    xhr.onreadystatechange = function() {
-                        if(xhr.readyState >= 3) {
-                            if (!firstPacketReceived) {
-                                output_element.innerHTML = '';
-                                firstPacketReceived = true;
-                            }
-                            const receivedData = xhr.response.substr(byteCount);
-                            output_element.innerHTML += receivedData;
-                            byteCount = xhr.responseText.length;
-                        }
-                        if (xhr.readyState === 4 && !exiting) {
-                            check_exit_code(job_name, job_execution_id);
-                        }
-                    };
-                    xhr.addEventListener("error", (e) => console.log("Error", e));
-                    xhr.send();
-                }
-
-                function check_exit_code(job_name, job_execution_id) {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('GET', `/api/job/${job_name}/execution/${job_execution_id}/exit_code`);
-                    xhr.onreadystatechange = function() {
-                        if (xhr.readyState === 4) {
-                            if (xhr.response === '') { return; }
-                            status_element.classList.remove("is-running");
-                            const exit_code = parseInt(xhr.response);
-                            if (exit_code === 0) {
-                                status_element.classList.add("is-finished");
-                                status_element.innerHTML = 'Finished';
-                            } else {
-                                status_element.classList.add("is-failed");
-                                status_element.innerHTML = 'Failed';
-                            }
-                        }
-                    };
-                    xhr.addEventListener("error", (e) => console.log("Error", e));
-                    xhr.send();
-                }
-
-                subscribe_output("<%= job_info.name %>", "<%= job_execution.id %>")
+                init("<%= job_info.name %>", "<%= job_execution.id %>")
             </script>
         <%- end -%>
     <%- end -%>
