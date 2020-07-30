@@ -1,5 +1,5 @@
 require "spec"
-require "../src/web/utils"
+require "../src/web/utils/ansi_filter"
 
 module Workr::Web::Utils
   describe "ansi_filter" do

@@ -1,6 +1,6 @@
 require "router"
 require "ecr"
-require "./utils"
+require "./utils/ansi_filter"
 require "../services/job_info_service"
 require "../services/job_data_service"
 require "../services/job_execution_service"
