@@ -70,7 +70,9 @@ function create-release {
         --user "${USER}" \
         --repo "${REPO}" \
         --tag "v$(get-builded-version)" \
-        --name "Workr $(get-builded-version)"
+        --name "Workr $(get-builded-version)" \
+        --description "$(git log --format=%B -n 1 HEAD)" \
+        --target "$(git rev-parse HEAD)"
     new-line
 }
 
