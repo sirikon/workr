@@ -3,7 +3,7 @@
         <head>
             <meta charset="utf8">
             <title>Workr<%= title == "" ? "" : " | #{title}" %></title>
-            <link rel="stylesheet" href="/style.css" />
+            <link rel="stylesheet" href="/style.<%= @cache_buster %>.css" />
         </head>
         <body>
             <header class="header">

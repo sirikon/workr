@@ -1,8 +1,18 @@
 module Workr::Web::Templates
   extend self
 
+  {% if flag?(:release) %}
+  CACHE_BUSTER = Time.utc.to_unix
+  {% end %}
+
   class TemplateExecutionContext
     property io : IO = IO::Memory.new
+
+    {% if flag?(:release) %}
+    property cache_buster : Int64 = CACHE_BUSTER
+    {% else %}
+    property cache_buster : Int64 = Time.utc.to_unix_ms
+    {% end %}
 
     macro define_templates(*template_paths)
       {% for template_path, index in template_paths %}

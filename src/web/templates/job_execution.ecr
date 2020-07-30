@@ -13,7 +13,7 @@
         </div>
 
         <%- if !job_execution.finished -%>
-            <script type="text/javascript" src="/job_execution.js"></script>
+            <script type="text/javascript" src="/job_execution.<%= @cache_buster %>.js"></script>
             <script>
                 init("<%= job_info.name %>", "<%= job_execution.id %>")
             </script>

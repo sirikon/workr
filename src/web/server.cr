@@ -14,7 +14,7 @@ module Workr::Web::Server
     include Router
 
     macro reply_asset(ctx, path, content_type)
-      {{ctx}}.response.headers.add("Cache-Control", "max-age=3600")
+      {{ctx}}.response.headers.add("Cache-Control", "max-age=604800")
       {{ctx}}.response.content_type = {{content_type}}
       {% if flag?(:embed_web_assets) %}
         {{ctx}}.response.print {{ read_file("#{__DIR__}/assets/" + path) }}
@@ -114,10 +114,10 @@ module Workr::Web::Server
         context
       end
 
-      get "/style.css" do |context, params|
+      get "/style.:buster.css" do |context, params|
         reply_asset context, "style.css", "text/css"
       end
-      get "/job_execution.js" do |context, params|
+      get "/job_execution.:buster.js" do |context, params|
         reply_asset context, "job_execution.js", "text/javascript"
       end
     end
