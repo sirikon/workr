@@ -1,10 +1,10 @@
 require "jwt"
+require "../../configuration/config"
 
 module Workr::Web::Utils::Auth
   extend self
 
   IDENTITY_COOKIE_KEY = "workr_identity"
-  JWT_SECRET = "secret"
 
   record Identity,
     is_admin : Bool
@@ -14,7 +14,11 @@ module Workr::Web::Utils::Auth
     if token.nil?
       return Identity.new(is_admin: false)
     end
-    parse_identity_token(token.not_nil!)
+    identity = parse_identity_token(token.not_nil!)
+    if identity.nil?
+      return Identity.new(is_admin: false)
+    end
+    identity
   end
 
   def set_identity(context : HTTP::Server::Context, identity : Identity)
@@ -23,13 +27,18 @@ module Workr::Web::Utils::Auth
   end
 
   private def parse_identity_token(token)
-    payload, header = JWT.decode(token, JWT_SECRET, JWT::Algorithm::HS512)
-    Identity.new(is_admin: payload["is_admin"].as_bool)
+    identity = nil
+    begin
+      payload, header = JWT.decode(token, get_jwt_secret, JWT::Algorithm::HS512)
+      identity = Identity.new(is_admin: payload["is_admin"].as_bool)
+    rescue
+    end
+    identity
   end
 
   private def encode_identity_token(identity)
     payload = { "is_admin" => identity.is_admin }
-    JWT.encode(payload, JWT_SECRET, JWT::Algorithm::HS512)
+    JWT.encode(payload, get_jwt_secret, JWT::Algorithm::HS512)
   end
 
   private def get_identity_token(context)
@@ -44,5 +53,9 @@ module Workr::Web::Utils::Auth
     context.response.cookies << HTTP::Cookie.new(
       name: IDENTITY_COOKIE_KEY,
       value: token)
+  end
+
+  private def get_jwt_secret
+    Configuration.read.@jwt_secret
   end
 end

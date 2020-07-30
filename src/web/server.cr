@@ -1,5 +1,7 @@
 require "router"
 require "ecr"
+require "crypto/bcrypt/password"
+require "../configuration/config"
 require "./utils/ansi_filter"
 require "./utils/auth"
 require "../services/job_info_service"
@@ -51,7 +53,16 @@ module Workr::Web::Server
         end
 
         context.response.status = HTTP::Status::SEE_OTHER
-        if username == "admin" && password == "admin"
+        if username.nil? || password.nil?
+          context.response.headers.add("Location", "/login")
+          next context
+        end
+
+        config = Configuration.read
+        context.response.status = HTTP::Status::SEE_OTHER
+        bcrypt_pass = Crypto::Bcrypt::Password.new(config.@admin_password_hash)
+
+        if username == "admin" && bcrypt_pass.verify(password)
           identity = Utils::Auth::Identity.new(is_admin: true)
           Utils::Auth.set_identity(context, identity)
           context.response.headers.add("Location", "/")
