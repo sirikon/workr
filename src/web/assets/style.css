@@ -149,6 +149,22 @@ a {
     background-color: #14D9D2;
 }
 
+.input {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    padding: .7em;
+    border-radius: 3px;
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+}
+
+.input:focus {
+    border: 1px solid #12CBC4;
+    outline: none;
+}
+
 .console_output {
     background-color: #3c3c3c;
     color: white;
@@ -204,4 +220,21 @@ a {
     animation-duration: 2s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
+}
+
+.login {
+    display: flex;
+    margin: auto;
+    flex-direction: column;
+    max-width: 300px;
+}
+
+.login label {
+    margin: 10px 0 5px 0;
+    font-weight: 100;
+}
+
+.login .button {
+    margin-top: 10px;
+    font-size: 1.1em;
 }
