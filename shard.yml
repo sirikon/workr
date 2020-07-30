@@ -13,3 +13,5 @@ targets:
 dependencies:
   router:
     github: tbrand/router.cr
+  jwt:
+    github: crystal-community/jwt

@@ -4,29 +4,33 @@ module Workr::Web::Templates
   VERSION = {{ `shards version`.stringify }}
 
   {% if flag?(:release) %}
-  CACHE_BUSTER = Time.utc.to_unix
+    CACHE_BUSTER = Time.utc.to_unix
   {% end %}
 
   class TemplateExecutionContext
     property io : IO = IO::Memory.new
 
+    def initialize(
+      @identity : Utils::Auth::Identity
+    ); end
+
     {% if flag?(:release) %}
-    property cache_buster : Int64 = CACHE_BUSTER
+      property cache_buster : Int64 = CACHE_BUSTER
     {% else %}
-    property cache_buster : Int64 = Time.utc.to_unix_ms
+      property cache_buster : Int64 = Time.utc.to_unix_ms
     {% end %}
 
     def time_ago(time : Time)
       ago_text = ""
       time_ago = Time.utc - time
       if time_ago.days > 0
-          ago_text = "#{time_ago.days} days ago"
+        ago_text = "#{time_ago.days} days ago"
       elsif time_ago.hours > 0
-          ago_text = "#{time_ago.hours} hours ago"
+        ago_text = "#{time_ago.hours} hours ago"
       elsif time_ago.minutes > 0
-          ago_text = "#{time_ago.minutes} minutes ago"
+        ago_text = "#{time_ago.minutes} minutes ago"
       else
-          ago_text = "#{time_ago.seconds} seconds ago"
+        ago_text = "#{time_ago.seconds} seconds ago"
       end
       return ago_text
     end
@@ -39,13 +43,14 @@ module Workr::Web::Templates
 
     define_templates(
       "layouts/base",
+      "login",
       "home",
       "job",
       "job_execution"
     )
   end
 
-  def run
-    TemplateExecutionContext.new
+  def run(identity)
+    TemplateExecutionContext.new(identity)
   end
 end

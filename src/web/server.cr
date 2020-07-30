@@ -1,6 +1,7 @@
 require "router"
 require "ecr"
 require "./utils/ansi_filter"
+require "./utils/auth"
 require "../services/job_info_service"
 require "../services/job_data_service"
 require "../services/job_execution_service"
@@ -25,6 +26,12 @@ module Workr::Web::Server
     end
 
     def draw_routes
+
+      get "/login" do |context, params|
+        context.response.print get_templates(context).login()
+        context
+      end
+
       get "/" do |context, params|
         jobs = Services::JobInfoService.get_all_jobs.map do |job|
           job_data = Services::JobDataService.get_job(job.name)
@@ -34,13 +41,13 @@ module Workr::Web::Server
           end
           {info: job, latest_execution: latest_execution_data}
         end
-        context.response.print Templates.run.home(jobs)
+        context.response.print get_templates(context).home(jobs)
         context
       end
       get "/job/:name" do |context, params|
         job_info = Services::JobInfoService.get_job params["name"]
         job_executions = Services::JobDataService.get_all_executions(job_info.name)
-        context.response.print Templates.run.job(job_info, job_executions)
+        context.response.print get_templates(context).job(job_info, job_executions)
         context
       end
       get "/job/:name/execution/:execution" do |context, params|
@@ -50,10 +57,15 @@ module Workr::Web::Server
         job_execution = Services::JobDataService.get_execution job_name, job_execution_id
         job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
         ansi_filter = Utils::AnsiFilter.new
-        context.response.print Templates.run.job_execution(job_info, job_execution.not_nil!, ansi_filter.filter(job_execution_output))
+        context.response.print get_templates(context).job_execution(job_info, job_execution.not_nil!, ansi_filter.filter(job_execution_output))
         context
       end
       post "/job/:name/run" do |context, params|
+        identity = get_identity(context)
+        if !identity.is_admin
+          context.response.status = HTTP::Status::UNAUTHORIZED
+          next context
+        end
         job_name = params["name"]
         execution_id = Services::JobExecutionService.run(job_name)
         context.response.status = HTTP::Status::SEE_OTHER
@@ -120,6 +132,15 @@ module Workr::Web::Server
       get "/job_execution.:buster.js" do |context, params|
         reply_asset context, "job_execution.js", "text/javascript"
       end
+    end
+
+    private def get_templates(context)
+      Templates.run(
+        get_identity(context))
+    end
+
+    private def get_identity(context)
+      Utils::Auth.get_identity(context)
     end
 
     def run

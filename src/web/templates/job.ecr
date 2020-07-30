@@ -3,9 +3,11 @@
         <h3 class="section_title">
             Job
             <b><%= job_info.name %></b>
-            <form method="post" action="/job/<%= job_info.name %>/run">
-                <input type="submit" value="Execute" class="button" />
-            </form>
+            <%- if @identity.is_admin -%>
+                <form method="post" action="/job/<%= job_info.name %>/run">
+                    <input type="submit" value="Execute" class="button" />
+                </form>
+            <%- end -%>
         </h3>
 
         <div class="table">
