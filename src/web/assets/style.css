@@ -31,8 +31,19 @@ a {
     flex-shrink: 0;
 }
 
+.header .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .header h1 {
+    flex-grow: 1;
     font-weight: normal;
+}
+
+.header .identity {
+    flex-shrink: 0;
 }
 
 .header h1 a {

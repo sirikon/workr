@@ -1,10 +1,9 @@
 <%- def login() -%>
     <%- layout_base(title: "Login") do -%>
-
-        <form>
-            <input type="text" name="username" />
-            <input type="password" name="password" />
+        <form method="post" enctype="multipart/form-data">
+            <input type="text" name="username" placeholder="Username" autofocus /><br/>
+            <input type="password" name="password" placeholder="Password" /><br/>
+            <input type="submit" value="Login" />
         </form>
-
     <%- end -%>
 <%- end -%>

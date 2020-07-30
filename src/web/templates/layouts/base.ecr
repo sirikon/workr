@@ -9,6 +9,13 @@
             <header class="header">
                 <div class="container">
                     <h1><a href="/">Workr</a></h1>
+                    <div class="identity">
+                        <%- if @identity.is_admin -%>
+                            <a href="/logout">Log out</a>
+                        <%- else -%>
+                            <a href="/login">Login</a>
+                        <%- end -%>
+                    </div>
                 </div>
             </header>
             

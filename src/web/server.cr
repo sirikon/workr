@@ -31,6 +31,35 @@ module Workr::Web::Server
         context.response.print get_templates(context).login()
         context
       end
+      get "/logout" do |context, params|
+        identity = Utils::Auth::Identity.new(is_admin: false)
+        Utils::Auth.set_identity(context, identity)
+        context.response.status = HTTP::Status::SEE_OTHER
+        context.response.headers.add("Location", "/")
+        context
+      end
+      post "/login" do |context, params|
+        username = nil
+        password = nil
+        HTTP::FormData.parse(context.request) do |part|
+          case part.name
+          when "username"
+            username = part.body.gets_to_end
+          when "password"
+            password = part.body.gets_to_end
+          end
+        end
+
+        context.response.status = HTTP::Status::SEE_OTHER
+        if username == "admin" && password == "admin"
+          identity = Utils::Auth::Identity.new(is_admin: true)
+          Utils::Auth.set_identity(context, identity)
+          context.response.headers.add("Location", "/")
+        else
+          context.response.headers.add("Location", "/login")
+        end
+        context
+      end
 
       get "/" do |context, params|
         jobs = Services::JobInfoService.get_all_jobs.map do |job|
