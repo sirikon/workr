@@ -1,34 +1,31 @@
 <%- def home(jobs) -%>
     <%- layout_base(title: "Jobs") do -%>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Job</th>
-                    <th>Latest execution</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%- jobs.each do |job| -%>
-                    <%- job_info = job["info"] -%>
-                    <tr>
-                        <td>
-                            <a href="/job/<%= job_info.name %>">
-                                <%= job_info.name %>
-                            </a>
-                        </td>
-                        <td>
-                            <%- if !job["latest_execution"].nil? -%>
-                                <%- latest_execution = job["latest_execution"].not_nil! -%>
-                                <a href="/job/<%= job_info.name %>/execution/<%= latest_execution.id %>">#<%= latest_execution.id %></a><div class="status_dot is-<%= latest_execution.finished ? (latest_execution.exit_code == 0 ? "finished" : "failed") : "running" %>"></div>
-                                <span class="execution_date">(<%= latest_execution.start_date %>)</span>
-                            <%- end -%>
-                        </td>
-                    </tr>
-                <%- end -%>
-            </tbody>
-        </table>
-        <ul>
-            
-        </ul>
+
+        <div class="table">
+            <div class="table-header">
+                <div>Job</div>
+                <div>Latest execution</div>
+            </div>
+
+            <%- jobs.each do |job| -%>
+                <%- job_info = job["info"] -%>
+                <div class="table-row">
+                    <div>
+                        <a href="/job/<%= job_info.name %>">
+                            <%= job_info.name %>
+                        </a>
+                    </div>
+                    <div>
+                        <%- if !job["latest_execution"].nil? -%>
+                            <%- latest_execution = job["latest_execution"].not_nil! -%>
+                            <a href="/job/<%= job_info.name %>/execution/<%= latest_execution.id %>">#<%= latest_execution.id %></a><div class="status_dot is-<%= latest_execution.finished ? (latest_execution.exit_code == 0 ? "finished" : "failed") : "running" %>"></div>
+                            <span class="execution_date">(<%= latest_execution.start_date %>)</span>
+                        <%- end -%>
+                    </div>
+                </div>
+            <%- end -%>
+
+        </div>
+
     <%- end -%>
 <%- end -%>

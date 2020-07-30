@@ -1,6 +1,8 @@
 module Workr::Web::Templates
   extend self
 
+  VERSION = {{ `shards version`.stringify }}
+
   {% if flag?(:release) %}
   CACHE_BUSTER = Time.utc.to_unix
   {% end %}

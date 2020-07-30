@@ -1,9 +1,15 @@
+html, body {
+    height: 100%;
+}
+
 body {
     background-color: whitesmoke;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     margin: 0;
     overflow-x: hidden;
     overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
 }
 
 a {
@@ -22,6 +28,7 @@ a {
     background-color: white;
     padding: 1px 0;
     box-shadow: 0px -10px 3px 10px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
 }
 
 .header h1 {
@@ -35,30 +42,57 @@ a {
 
 .content {
     padding: 10px 0;
+    flex-grow: 1;
+}
+
+.footer {
+    text-align: center;
+    flex-shrink: 0;
+    color: rgba(0,0,0,0.2);
+    font-size: .8em;
+    padding-bottom: 10px;
 }
 
 .table {
-    border-collapse: collapse;
+    display: table;
+    border-spacing: 0 5px;
     width: 100%;
 }
 
-.table tr {
-    border-bottom: 3px solid whitesmoke;
-    border-radius: 3px;
-    overflow: hidden;
+.table-header, .table-row {
+    display: table-row;
 }
 
-.table th, .table td {
-    padding: 5px;
-}
-
-.table th {
-    text-align: left;
+.table-header {
     font-weight: 100;
 }
 
-.table td {
+.table-row {
+    margin-bottom: 10px;
+}
+
+.table-header > div, .table-row > div {
+    display: table-cell;
+    padding: 5px;
+}
+
+.table-header > div {
+    padding-bottom: 0;
+}
+
+.table-row > div {
     background-color: white;
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1);
+}
+
+.table-row > div:first-child {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+.table-row > div:last-child {
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
 }
 
 .table .execution_date {
@@ -73,6 +107,27 @@ a {
     display: inline-block;
     vertical-align: middle;
     margin: 0 0 0 .5em;
+}
+
+.button {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    background-color: #12CBC4;
+    padding: .3em 1em;
+    border-radius: 3px;
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    color: white;
+}
+
+.button:hover {
+    background-color: #13D2CB;
+}
+
+.button:active {
+    background-color: #14D9D2;
 }
 
 .console_output {

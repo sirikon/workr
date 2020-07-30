@@ -4,33 +4,32 @@
             Job
             <b><%= job_info.name %></b>
             <form method="post" action="/job/<%= job_info.name %>/run">
-                <input type="submit" value="Execute" />
+                <input type="submit" value="Execute" class="button" />
             </form>
         </h3>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Execution</th>
-                    <th>Start date</th>
-                    <th>End date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%- job_executions.each do |job_execution| -%>
-                    <tr>
-                        <td>
-                            <a href="/job/<%= job_info.name %>/execution/<%= job_execution.id %>">
-                                #<%= job_execution.id %></a><div class="status_dot is-<%= job_execution.finished ? (job_execution.exit_code == 0 ? "finished" : "failed") : "running" %>"></div>
-                        </td>
-                        <td>
-                            <span class="execution_date"><%= job_execution.start_date %></span>
-                        </td>
-                        <td>
-                            <span class="execution_date"><%= job_execution.end_date %></span>
-                        </td>
-                    </tr>
-                <%- end -%>
-            </tbody>
-        </table>
+
+        <div class="table">
+            <div class="table-header">
+                <div>Execution</div>
+                <div>Start date</div>
+                <div>End date</div>
+            </div>
+
+            <%- job_executions.each do |job_execution| -%>
+                <div class="table-row">
+                    <div>
+                        <a href="/job/<%= job_info.name %>/execution/<%= job_execution.id %>">
+                            #<%= job_execution.id %></a><div class="status_dot is-<%= job_execution.finished ? (job_execution.exit_code == 0 ? "finished" : "failed") : "running" %>"></div>
+                    </div>
+                    <div>
+                        <span class="execution_date"><%= job_execution.start_date %></span>
+                    </div>
+                    <div>
+                        <span class="execution_date"><%= job_execution.end_date %></span>
+                    </div>
+                </div>
+            <%- end -%>
+        </div>
+
     <%- end -%>
 <%- end -%>
