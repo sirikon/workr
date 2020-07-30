@@ -19,7 +19,8 @@
                         <%- if !job["latest_execution"].nil? -%>
                             <%- latest_execution = job["latest_execution"].not_nil! -%>
                             <a href="/job/<%= job_info.name %>/execution/<%= latest_execution.id %>">#<%= latest_execution.id %></a><div class="status_dot is-<%= latest_execution.finished ? (latest_execution.exit_code == 0 ? "finished" : "failed") : "running" %>"></div>
-                            <span class="execution_date">(<%= latest_execution.start_date %>)</span>
+                            <span class="execution_date"><%= latest_execution.start_date %></span>
+                            <span class="execution_date is-ago">(<%= time_ago(latest_execution.start_date) %>)</span>
                         <%- end -%>
                     </div>
                 </div>

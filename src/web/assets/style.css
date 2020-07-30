@@ -76,6 +76,10 @@ a {
     padding: 5px;
 }
 
+.table-header > div > *, .table-row > div > * {
+    vertical-align: middle;
+}
+
 .table-header > div {
     padding-bottom: 0;
 }
@@ -97,6 +101,10 @@ a {
 
 .table .execution_date {
     opacity: 0.4;
+}
+
+.table .execution_date.is-ago {
+    font-size: .8em;
 }
 
 .section_title {
@@ -160,7 +168,6 @@ a {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    margin-bottom: .2em;
     margin-left: .15em;
 }
 

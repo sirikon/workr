@@ -16,6 +16,21 @@ module Workr::Web::Templates
     property cache_buster : Int64 = Time.utc.to_unix_ms
     {% end %}
 
+    def time_ago(time : Time)
+      ago_text = ""
+      time_ago = Time.utc - time
+      if time_ago.days > 0
+          ago_text = "#{time_ago.days} days ago"
+      elsif time_ago.hours > 0
+          ago_text = "#{time_ago.hours} hours ago"
+      elsif time_ago.minutes > 0
+          ago_text = "#{time_ago.minutes} minutes ago"
+      else
+          ago_text = "#{time_ago.seconds} seconds ago"
+      end
+      return ago_text
+    end
+
     macro define_templates(*template_paths)
       {% for template_path, index in template_paths %}
         ECR.embed("#{__DIR__}/templates/" + {{ (template_path.id + ".ecr").stringify }}, @io)

@@ -11,11 +11,18 @@
         <div class="table">
             <div class="table-header">
                 <div>Execution</div>
-                <div>Start date</div>
-                <div>End date</div>
+                <div>Started</div>
+                <div>Duration</div>
             </div>
 
             <%- job_executions.each do |job_execution| -%>
+                <%-
+                    duration_text = ""
+                    if !job_execution.end_date.nil?
+                        duration_span = job_execution.end_date.not_nil! - job_execution.start_date
+                        duration_text = "#{duration_span.minutes > 9 ? "" : "0"}#{duration_span.minutes}:#{duration_span.seconds > 9 ? "" : "0"}#{duration_span.seconds}"
+                    end
+                -%>
                 <div class="table-row">
                     <div>
                         <a href="/job/<%= job_info.name %>/execution/<%= job_execution.id %>">
@@ -23,9 +30,10 @@
                     </div>
                     <div>
                         <span class="execution_date"><%= job_execution.start_date %></span>
+                        <span class="execution_date is-ago">(<%= time_ago(job_execution.start_date) %>)</span>
                     </div>
                     <div>
-                        <span class="execution_date"><%= job_execution.end_date %></span>
+                        <span class="execution_date"><%= duration_text %></span>
                     </div>
                 </div>
             <%- end -%>
