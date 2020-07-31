@@ -2,7 +2,7 @@
 
 Workr is a **simple** and **easy** to setup job runner for any kind of
 automation. Think of it like a lightweight and super-simplified
-[Jenkins](https://www.jenkins.io/) or a Self-Hoted
+[Jenkins](https://www.jenkins.io/) or a self-hosted
 [CircleCI](https://circleci.com/) that you configure using **plain text files**
 and each job is just a **runnable script**.
 
@@ -48,7 +48,7 @@ And visit http://127.0.0.1:8080/. It looks a bit empty, but no worries. Now
 it's time to define our **first job**.
 
 Create a `jobs` folder and, inside it, another folder called `pinger` with a
-file in it called `run`, with the following contents:
+file in it called `run`, with the following content:
 
 ```bash
 #!/usr/bin/env bash
@@ -91,4 +91,4 @@ Going back to http://127.0.0.1:8080/job/pinger, the execution list now has a
 new row. Here you can see all the executions that a job has, and the output of
 all of them is available with a single click.
 
-From now on, it's your turn to automate cool stuff. Enjoy Workr!.
+Now it's your turn to automate cool stuff with Workr. Enjoy it!.
