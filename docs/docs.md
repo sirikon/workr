@@ -12,6 +12,13 @@ many sections. This way you can:
 - Get both the superficial docs (The Quickstart) and the more detailed docs.
 - Use `Ctrl + F` to find anything in it.
 
+## Table of Contents
+
+- [Quickstart](#quickstart)
+- [Design decisions](#design-decisions)
+  - [Workr is a job runner. Nothing more](#workr-is-a-job-runner-nothing-more)
+  - [Workr is small](#workr-is-small)
+
 ## Quickstart
 
 The first step is to install Workr. Workr is distributed as a pre-compiled
