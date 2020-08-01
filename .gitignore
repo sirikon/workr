@@ -3,3 +3,4 @@
 /.shards/
 *.dwarf
 /tmp
+/out
