@@ -1,8 +1,0 @@
-Package: workr
-Version: ${VERSION}
-Section: base
-Priority: optional
-Architecture: amd64
-Maintainer: Carlos Fdez. Llamas <hello@sirikon.me>
-Description: Workr
- https://github.com/sirikon/workr

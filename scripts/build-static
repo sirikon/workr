@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-cd "$(dirname "${BASH_SOURCE[0]}")/../docker"
-
-mkdir -p ./out
-docker-compose up --build --no-color
-docker cp "$(docker-compose ps -q builder)":/builder/bin/workr "./out/workr"
-docker-compose run builder shards version > "./out/version"
-docker-compose down
