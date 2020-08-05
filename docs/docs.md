@@ -119,12 +119,15 @@ from similar CI/CD services or job runners, like:
   you need to setup QEMU in the machine and use it in the job, so the external
   dependencies are downloaded in a sandboxed environment.
 
-- **Integration with third party services**: Workr can surely improve in
+- **Integration with third party proprietary services**: Workr can surely improve in
   reporting and transparency, so you can run extra steps when jobs are started
-  or done, but Workr won't include, by itself, any code that knows how to talk
-  with external services. For example: If you need to get notified on Slack
-  when an specific job is finished, then run some script within the job itself
-  that does so.
+  or done, or improve how jobs are triggered, but Workr won't include, by itself,
+  any code that knows how to talk with external proprietary services. For example:
+  If you need to get notified on Slack when an specific job is finished, then run
+  some script within the job itself that does so. This doesn't apply to code that
+  knows how to talk or react to external services that implement well-known/generic
+  mechanisms. For example: Triggering jobs using Webhooks like the ones implemented
+  in GitHub or Gitea is on the way.
 
 As of today, don't expect to get any of those functionalities in Workr anytime
 soon. But if you disagree and you really think that any of those features
