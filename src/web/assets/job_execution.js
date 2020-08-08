@@ -2,6 +2,7 @@ const init = (function(job_name, job_execution_id){
     const output_el = document.getElementById('job_execution_output');
     const status_el = document.getElementById('job_execution_finished');
     const keep_body_on_bottom_threshold = 0;
+    const line_el_base = document.createElement('pre');
     let output_last_line_el = null;
     let dangling_carriage_return = false;
     let exiting = false;
@@ -11,14 +12,16 @@ const init = (function(job_name, job_execution_id){
 
     function subscribe_output() {
         let output_buffer = [];
-        let buffer_interval = setInterval(() => {
-            if (output_buffer.length === 0) { return; }
-            append_output(output_buffer.join(''));
-            output_buffer = [];
-            if (done) {
-                clearInterval(buffer_interval);
+        let buffer_interval = () => {
+            if (output_buffer.length > 0) {
+                append_output(output_buffer.join(''));
+                output_buffer = [];
             }
-        }, 100);
+            if (!done) {
+                window.requestAnimationFrame(buffer_interval);
+            }
+        };
+        window.requestAnimationFrame(buffer_interval);
         httpGETStream('output_stream', (data, error) => {
             if (error) { return console.log("Error while reading output stream", error); }
             if (data === null) {
@@ -80,7 +83,7 @@ const init = (function(job_name, job_execution_id){
                 dangling_carriage_return = false;
             }
 
-            if (char === '\r') {
+            if (char === '\r' || char === '\n') {
                 new_output_line();
                 continue;
             }
@@ -96,7 +99,14 @@ const init = (function(job_name, job_execution_id){
     }
 
     function new_output_line() {
-        lineBuffer.push('\n');
+        // If the current line is empty, insert a newline in it before
+        // inserting the new one, so it has a minimal height when displayed.
+        if (lineBuffer.length === 0) {
+            lineBuffer.push('\n');
+        }
+        flush_line_buffer();
+        output_last_line_el = line_el_base.cloneNode();
+        output_el.appendChild(output_last_line_el);
     }
 
     function flush_line_buffer() {
