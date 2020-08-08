@@ -95,8 +95,7 @@ module Workr::Web::Server
         job_execution_id = UInt32.new(params["execution"])
         job_info = Services::JobInfoService.get_job params["name"]
         job_execution = Services::JobDataService.get_execution job_name, job_execution_id
-        # job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
-        job_execution_output = ""
+        job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
         ansi_filter = Utils::AnsiFilter.new
         context.response.print get_templates(context).job_execution(job_info, job_execution.not_nil!, ansi_filter.filter(job_execution_output))
         context
@@ -125,40 +124,59 @@ module Workr::Web::Server
           next context
         end
         if job_execution.not_nil!.finished
-          #context.response.print Services::JobDataService.get_execution_output job_name, job_execution_id
-          context.response.print ""
+          context.response.print Services::JobDataService.get_execution_output job_name, job_execution_id
           next context
         end
 
         ansi_filter = Utils::AnsiFilter.new
         done = Channel(Nil).new
-        bytes_channel = Channel(Bytes).new(100)
+        output_buffer = [] of Bytes
 
         spawn do
+          stop = false
+
           loop do
-            bytes = bytes_channel.receive
-            if (context.response.closed? || bytes.size == 0)
+            if stop
               done.send(nil)
               break
             end
-
-            if !context.response.closed?
-              # Even after checking that the response is closed, it could raise
-              # an exception, so it needs handling
-              begin
-                context.response.write(ansi_filter.filter(bytes))
-                context.response.flush
-              rescue
-                done.send(nil)
-              end
-            else
-              done.send(nil)
+            sleep 0.1
+            if output_buffer.size == 0
+              next
             end
+
+            i = 0
+            while i < output_buffer.size
+              bytes = output_buffer[i]
+
+              if (context.response.closed? || bytes.size == 0)
+                stop = true
+                break
+              end
+  
+              if !context.response.closed?
+                # Even after checking that the response is closed, it could raise
+                # an exception, so it needs handling
+                begin
+                  context.response.write(ansi_filter.filter(bytes))
+                  context.response.flush
+                rescue
+                  stop = true
+                  break
+                end
+              else
+                stop = true
+                break
+              end
+
+              i = i + 1
+            end
+            output_buffer.clear
           end
         end
 
         canceller = Services::JobDataService.subscribe_execution_output job_name, job_execution_id do |bytes|
-          bytes_channel.send(bytes)
+          output_buffer << bytes
         end
 
         done.receive

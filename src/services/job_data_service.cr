@@ -149,9 +149,7 @@ module Workr::Services::JobDataService
       return
     end
     @@job_execution_output_subscribers[job_execution_key].each do |subscriber|
-      #spawn do
-        subscriber.call(bytes)
-      #end
+      subscriber.call(bytes)
     end
 
     if (bytes.size == 0)
