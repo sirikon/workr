@@ -10,7 +10,6 @@ shards_build_static_arg=""
 if [ "${1:-""}" == "static" ];then
     shards_build_static_arg="--static"
 fi
-shards build -Dembed_web_assets --release --production --no-debug $shards_build_static_arg
-strip bin/workr
+shards build -Dembed_web_assets --release --production $shards_build_static_arg
 cp ./bin/workr ./out/bin/workr
 shards version > ./out/version
