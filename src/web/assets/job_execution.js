@@ -7,6 +7,7 @@ const init = (function(job_name, job_execution_id){
     let exiting = false;
     let done = false;
     let firstByteReceived = false;
+    const lineBuffer = [];
 
     function subscribe_output() {
         let output_buffer = [];
@@ -60,7 +61,8 @@ const init = (function(job_name, job_execution_id){
 
         const keepBodyOnBottom = document.body.scrollTop + keep_body_on_bottom_threshold >= getBodyScrollTopMax();
 
-        for (const char of data) {
+        for (let i = 0; i < data.length; i++) {
+            const char = data[i];
             if (!dangling_carriage_return && char === '\r') {
                 dangling_carriage_return = true;
                 continue;
@@ -82,9 +84,11 @@ const init = (function(job_name, job_execution_id){
                 new_output_line();
                 continue;
             }
-            
-            output_last_line_el.textContent += char;
+
+            lineBuffer.push(char);
         }
+
+        flush_line_buffer();
 
         if (keepBodyOnBottom) {
             document.body.scrollTop = document.body.scrollHeight;
@@ -92,13 +96,11 @@ const init = (function(job_name, job_execution_id){
     }
 
     function new_output_line() {
-        // If the current line is empty, insert a newline in it before
-        // inserting the new one, so it has a minimal height when displayed.
-        if (output_last_line_el.textContent.length === 0) {
-            output_last_line_el.textContent = '\n';
-        }
-        output_last_line_el = document.createElement('pre');
-        output_el.appendChild(output_last_line_el);
+        lineBuffer.push('\n');
+    }
+
+    function flush_line_buffer() {
+        output_last_line_el.textContent += lineBuffer.splice(0).join('');
     }
 
     function refresh_exit_code() {
