@@ -4,7 +4,7 @@ module Workr::Services::JobInfoService
   extend self
 
   def get_all_jobs
-    Dir.children(get_jobs_folder).map do |job_name|
+    Dir.children(get_jobs_folder).sort.map do |job_name|
       Models::JobInfo.new(
         job_name,
         get_job_path(job_name).to_s,
