@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-for i in {1..100000}
-do
-   echo "Log line number #$i"
-   sleep 0.00001
-done
+sleep 2
+cat output.log

@@ -132,24 +132,33 @@ module Workr::Web::Server
 
         ansi_filter = Utils::AnsiFilter.new
         done = Channel(Nil).new
-        canceller = Services::JobDataService.subscribe_execution_output job_name, job_execution_id do |bytes|
-          if (context.response.closed? || bytes.size == 0)
-            done.send(nil)
-            next
-          end
+        bytes_channel = Channel(Bytes).new(100)
 
-          if !context.response.closed?
-            # Even after checking that the response is closed, it could raise
-            # an exception, so it needs handling
-            begin
-              context.response.write(ansi_filter.filter(bytes))
-              context.response.flush
-            rescue
+        spawn do
+          loop do
+            bytes = bytes_channel.receive
+            if (context.response.closed? || bytes.size == 0)
+              done.send(nil)
+              break
+            end
+
+            if !context.response.closed?
+              # Even after checking that the response is closed, it could raise
+              # an exception, so it needs handling
+              begin
+                context.response.write(ansi_filter.filter(bytes))
+                context.response.flush
+              rescue
+                done.send(nil)
+              end
+            else
               done.send(nil)
             end
-          else
-            done.send(nil)
           end
+        end
+
+        canceller = Services::JobDataService.subscribe_execution_output job_name, job_execution_id do |bytes|
+          bytes_channel.send(bytes)
         end
 
         done.receive
