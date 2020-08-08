@@ -39,6 +39,7 @@ module Workr::Services::JobDataService
       spawn do
         while writing
           file.fsync
+          empty_output_cache(job_name, job_execution_id)
           sleep 2
         end
       end
@@ -107,6 +108,15 @@ module Workr::Services::JobDataService
     end
     @@job_execution_output_subscribers[job_execution_key] << subscriber
 
+    job_execution_data_folder = get_job_execution_data_folder(job_name, job_execution_id)
+    if File.exists?(job_execution_data_folder / "output.log")
+      file = File.open(job_execution_data_folder / "output.log", mode: "r")
+      file.each_byte do |byte|
+        subscriber.call(Slice(UInt8).new(1, byte))
+      end
+      file.close
+    end
+
     if @@job_execution_output_cache.has_key?(job_execution_key)
       @@job_execution_output_cache[job_execution_key].each do |bytes|
         subscriber.call(bytes)
@@ -145,7 +155,14 @@ module Workr::Services::JobDataService
     end
 
     if (bytes.size == 0)
-      @@job_execution_output_subscribers[job_execution_key].clear
+      empty_output_cache(job_name, job_execution_id)
+    end
+  end
+
+  private def empty_output_cache(job_name, job_execution_id)
+    job_execution_key = "#{job_name}##{job_execution_id}"
+    if @@job_execution_output_cache.has_key?(job_execution_key)
+      @@job_execution_output_cache[job_execution_key].clear
     end
   end
 

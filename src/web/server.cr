@@ -95,7 +95,8 @@ module Workr::Web::Server
         job_execution_id = UInt32.new(params["execution"])
         job_info = Services::JobInfoService.get_job params["name"]
         job_execution = Services::JobDataService.get_execution job_name, job_execution_id
-        job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
+        # job_execution_output = Services::JobDataService.get_execution_output job_name, job_execution_id
+        job_execution_output = ""
         ansi_filter = Utils::AnsiFilter.new
         context.response.print get_templates(context).job_execution(job_info, job_execution.not_nil!, ansi_filter.filter(job_execution_output))
         context
@@ -124,7 +125,8 @@ module Workr::Web::Server
           next context
         end
         if job_execution.not_nil!.finished
-          context.response.print Services::JobDataService.get_execution_output job_name, job_execution_id
+          #context.response.print Services::JobDataService.get_execution_output job_name, job_execution_id
+          context.response.print ""
           next context
         end
 
