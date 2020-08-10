@@ -129,23 +129,22 @@ module Workr::Web::Server
         end
 
         ansi_filter = Utils::AnsiFilter.new
-        stream_awaiter = Channel(Nil).new
-        done = false
-        stream_done = ->() {
-          done = true
-          if !stream_awaiter.closed?
-            stream_awaiter.send(nil)
-            stream_awaiter.close
+        done = Channel(Nil).new
+        terminating = false
+        terminate = ->() {
+          if !terminating
+            terminating = true
+            done.send(nil)
           end
         }
 
         canceller = Services::JobDataService.subscribe_execution_output(job_name, job_execution_id) do |bytes|
-          if (stream_awaiter.closed? || done)
+          if terminating
             next
           end
 
           if (context.response.closed? || bytes.size == 0)
-            stream_done.call()
+            terminate.call()
             next
           end
 
@@ -156,14 +155,14 @@ module Workr::Web::Server
               context.response.write(ansi_filter.filter(bytes))
               context.response.flush
             rescue ex
-              stream_done.call()
+              terminate.call()
             end
           else
-            stream_done.call()
+            terminate.call()
           end
         end
 
-        stream_awaiter.receive
+        done.receive
         canceller.call()
         context
       end
