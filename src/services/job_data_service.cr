@@ -108,18 +108,23 @@ module Workr::Services::JobDataService
     end
     @@job_execution_output_subscribers[job_execution_key] << subscriber
 
-    job_execution_data_folder = get_job_execution_data_folder(job_name, job_execution_id)
-    if File.exists?(job_execution_data_folder / "output.log")
-      file = File.open(job_execution_data_folder / "output.log", mode: "r")
-      file.each_byte do |byte|
-        subscriber.call(Slice(UInt8).new(1, byte))
+    # Wait a bit, until the next event loop iteration, to send the first bytes.
+    # We're giving time to the subscriber to stablish it's own cancellation mechanisms
+    # before potentially provoking a cancellation and the very beginning.
+    spawn do
+      job_execution_data_folder = get_job_execution_data_folder(job_name, job_execution_id)
+      if File.exists?(job_execution_data_folder / "output.log")
+        file = File.open(job_execution_data_folder / "output.log", mode: "r")
+        file.each_byte do |byte|
+          subscriber.call(Slice(UInt8).new(1, byte))
+        end
+        file.close
       end
-      file.close
-    end
 
-    if @@job_execution_output_cache.has_key?(job_execution_key)
-      @@job_execution_output_cache[job_execution_key].each do |bytes|
-        subscriber.call(bytes)
+      if @@job_execution_output_cache.has_key?(job_execution_key)
+        @@job_execution_output_cache[job_execution_key].each do |bytes|
+          subscriber.call(bytes)
+        end
       end
     end
 
@@ -148,8 +153,33 @@ module Workr::Services::JobDataService
     if !@@job_execution_output_subscribers.has_key?(job_execution_key)
       return
     end
-    @@job_execution_output_subscribers[job_execution_key].each do |subscriber|
-      subscriber.call(bytes)
+
+    # Calling a subscriber could trigger the subscriber itself being removed
+    # from the list. In the case this happens, we don't want to mess up the
+    # indexes we haven't iterated over yet.
+    #
+    # That's why here we're iterating the array in reverse. Here's an example:
+    # 
+    #     0  1  2  3
+    #    [a, b, c, d]
+    #           ^
+    # With the cursor on position 2, Subscriber "c" decides to remove itself
+    # from the list, but when that's done, we don't need to access to index
+    # 2 again.
+    #
+    #     0  1  2
+    #    [a, b, d]
+    #         <-^
+    # The next index is 1, which stays the same.
+    #     0  1  2
+    #    [a, b, d]
+    #        ^
+    #
+    subscribers = @@job_execution_output_subscribers[job_execution_key]
+    i = subscribers.size - 1
+    while i >= 0
+      subscribers[i].call(bytes)
+      i = i - 1
     end
 
     if (bytes.size == 0)

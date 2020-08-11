@@ -132,17 +132,11 @@ module Workr::Web::Server
         done = Channel(Nil).new
         terminating = false
         terminate = ->() {
-          if !terminating
-            terminating = true
-            done.send(nil)
-          end
+          done.send(nil)
+          done.send(nil)
         }
 
         canceller = Services::JobDataService.subscribe_execution_output(job_name, job_execution_id) do |bytes|
-          if terminating
-            next
-          end
-
           if (context.response.closed? || bytes.size == 0)
             terminate.call()
             next
@@ -164,6 +158,7 @@ module Workr::Web::Server
 
         done.receive
         canceller.call()
+        done.receive
         context
       end
 
