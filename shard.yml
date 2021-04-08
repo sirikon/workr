@@ -1,6 +1,5 @@
 name: workr
 version: 0.3.3
-crystal: 0.35.1
 license: GPL-3.0
 
 authors:

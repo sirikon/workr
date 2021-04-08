@@ -9,7 +9,7 @@ shards:
     version: 1.5.0
 
   openssl_ext:
-    git: https://github.com/stakach/openssl_ext.git
+    git: https://github.com/spider-gazelle/openssl_ext.git
     version: 2.1.2
 
   radix:
