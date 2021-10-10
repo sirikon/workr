@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+
+  workr-build:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - ../src:/code/src:ro
+      - ../spec:/code/spec:ro
+      - ../shard.yml:/code/shard.yml
+      - ../shard.lock:/code/shard.lock

@@ -2,15 +2,15 @@ version: 2.0
 shards:
   bindata:
     git: https://github.com/spider-gazelle/bindata.git
-    version: 1.8.2
+    version: 1.9.1
 
   jwt:
     git: https://github.com/crystal-community/jwt.git
-    version: 1.5.0
+    version: 1.6.0
 
   openssl_ext:
     git: https://github.com/spider-gazelle/openssl_ext.git
-    version: 2.1.2
+    version: 2.1.5
 
   radix:
     git: https://github.com/luislavena/radix.git
@@ -18,5 +18,5 @@ shards:
 
   router:
     git: https://github.com/tbrand/router.cr.git
-    version: 0.2.7
+    version: 0.2.8
 

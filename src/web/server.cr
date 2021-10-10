@@ -192,8 +192,8 @@ module Workr::Web::Server
 
     def run
       server = HTTP::Server.new(route_handler)
-      server.bind_tcp 8080
-      puts "Listening http://127.0.0.1:8080"
+      address = server.bind_tcp("0.0.0.0", 8080)
+      puts "Listening http://#{address}"
       server.listen
     end
   end
