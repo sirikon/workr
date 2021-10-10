@@ -6,4 +6,5 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y curl
 RUN curl -fsSL https://crystal-lang.org/install.sh | bash -s -- --version=1.1
 RUN apt-get install -y git libssl-dev
 RUN mkdir -p /code
-WORKDIR /code
+
+CMD tail -f /dev/null

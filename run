@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
-shards build
+
+mkdir -p bin
+cd ./docker
+docker-compose exec -w /code workr-build shards build -Dembed_web_assets
+docker cp "$(docker-compose ps -q workr-build):/code/bin/workr" ../bin/workr
+cd ..
 (cd testing-folder && ../bin/workr "$@")

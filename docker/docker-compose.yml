@@ -6,8 +6,6 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
-    ports:
-      - 8080:8080
     volumes:
       - ../src:/code/src:ro
       - ../spec:/code/spec:ro
