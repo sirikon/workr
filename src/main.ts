@@ -2,18 +2,12 @@ const resp = await fetch("http://127.0.0.1:4646/v1/jobs", {
   method: "POST",
   body: JSON.stringify({
     Job: {
-      ID: "example",
+      ID: "example-2",
       Datacenters: ["dc1"],
       Type: "batch",
-      Meta: {
-        execution: "5",
-      },
       TaskGroups: [
         {
           Name: "example-g",
-          Restart: {
-            Attempts: 0,
-          },
           Tasks: [
             {
               Name: "example-t2",
@@ -25,6 +19,12 @@ const resp = await fetch("http://127.0.0.1:4646/v1/jobs", {
                   "-c",
                   'for i in {1..100000}\ndo\necho "Log line number #$i"\nsleep 1\ndone',
                 ],
+              },
+              Restart: {
+                Attempts: 0,
+              },
+              Reschedule: {
+                Attempts: 0,
               },
             },
           ],
