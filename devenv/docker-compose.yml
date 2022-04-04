@@ -1,0 +1,9 @@
+version: "3.9"
+
+services:
+  build-agent:
+    build: build-agent
+    ports:
+      - 4646:4646
+    stop_signal: SIGKILL
+    stop_grace_period: 1s

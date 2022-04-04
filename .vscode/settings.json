@@ -1,0 +1,10 @@
+{
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+  },
+  "[python]": {
+    "editor.tabSize": 4
+  }
+}
