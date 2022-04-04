@@ -3,6 +3,10 @@
 def cli():
 
     @command
+    def run():
+        cmd('deno', 'run', '-A', 'src/main.ts')
+
+    @command
     def devenv_up():
         cmd('docker-compose', 'up', '-d', '--build', cwd='devenv')
 
